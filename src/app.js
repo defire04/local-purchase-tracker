@@ -17,7 +17,6 @@ let _autoSaveTm;
 function markDirty(key) {
   dirty[key] = true;
   document.getElementById('dirtyBadge').style.display = 'flex';
-  // Auto-save when folder is open via FSA (Chrome). Firefox uses manual save.
   if (dirHandle) {
     clearTimeout(_autoSaveTm);
     _autoSaveTm = setTimeout(() => saveAll(), 600);
@@ -53,7 +52,7 @@ function switchView(v) {
 function buildFilters() {
   const catSel = document.getElementById('filterCat');
   const cprev  = catSel.value;
-  catSel.innerHTML = '<option value="">Все категории</option>';
+  catSel.innerHTML = `<option value="">${T.allCats}</option>`;
   cats.forEach(c => {
     const o = document.createElement('option');
     o.value = c.id; o.textContent = c.name;
@@ -64,7 +63,7 @@ function buildFilters() {
   const brandSel = document.getElementById('filterBrand');
   const bprev    = brandSel.value;
   const brands   = [...new Set(data.map(i => i.brand).filter(Boolean))].sort();
-  brandSel.innerHTML = '<option value="">Все бренды</option>';
+  brandSel.innerHTML = `<option value="">${T.allBrands}</option>`;
   brands.forEach(b => {
     const o = document.createElement('option');
     o.value = b; o.textContent = b;
@@ -74,13 +73,45 @@ function buildFilters() {
 
   const shopSel = document.getElementById('filterShop');
   const sprev   = shopSel.value;
-  shopSel.innerHTML = '<option value="">Все магазины</option>';
+  shopSel.innerHTML = `<option value="">${T.allShops}</option>`;
   [...new Set(data.map(i => i.shop).filter(Boolean))].sort().forEach(id => {
     const o = document.createElement('option');
     o.value = id; o.textContent = shopName(id);
     shopSel.appendChild(o);
   });
   shopSel.value = sprev;
+
+  // Warranty filter options
+  const wSel = document.getElementById('filterWarranty');
+  const wprev = wSel.value;
+  wSel.innerHTML = `
+    <option value="">${T.allWarranty}</option>
+    <option value="ok">${T.wActive}</option>
+    <option value="warn">${T.w6m}</option>
+    <option value="expired">${T.wExpired}</option>
+    <option value="none">${T.wNone}</option>`;
+  wSel.value = wprev;
+
+  // Status filter options
+  const sSel = document.getElementById('filterStatus');
+  const sprevS = sSel.value;
+  sSel.innerHTML = `
+    <option value="">${T.allStatuses}</option>
+    <option value="active">${T.sActive}</option>
+    <option value="returned">${T.sReturned}</option>
+    <option value="written_off">${T.sWrittenOff}</option>`;
+  sSel.value = sprevS;
+
+  // GroupBy options
+  const gSel = document.getElementById('groupBy');
+  const gprev = gSel.value;
+  gSel.innerHTML = `
+    <option value="">${T.groupList}</option>
+    <option value="order">${T.groupOrder}</option>
+    <option value="shop">${T.groupShop}</option>
+    <option value="month">${T.groupMonth}</option>
+    <option value="category">${T.groupCat}</option>`;
+  gSel.value = gprev;
 }
 
 function hasTextFilters() {

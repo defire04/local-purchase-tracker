@@ -20,7 +20,7 @@ function mbClose(e, id) {
 
 function openAdd() {
   const f = id => document.getElementById(id);
-  document.getElementById('modalItemTitle').textContent = 'Добавить товар';
+  document.getElementById('modalItemTitle').textContent = T.modalAddTitle;
   f('fId').value = '';
   f('fName').value = '';
   f('fBrand').value = '';
@@ -47,7 +47,7 @@ function openEdit(id) {
   const it = data.find(x => x.id === id);
   if (!it) return;
   const f = id => document.getElementById(id);
-  document.getElementById('modalItemTitle').textContent = 'Редактировать';
+  document.getElementById('modalItemTitle').textContent = T.modalEditTitle;
   f('fId').value = it.id;
   f('fName').value = it.name || '';
   f('fBrand').value = it.brand || '';
@@ -86,7 +86,7 @@ function fillCatSelect(selId, val) {
 
 function fillShopSelect(selId, val) {
   const sel = document.getElementById(selId);
-  sel.innerHTML = '<option value="">— не выбран —</option>';
+  sel.innerHTML = `<option value="">${T.noShop}</option>`;
   shops.forEach(s => {
     const o = document.createElement('option');
     o.value = s.id; o.textContent = s.name;
@@ -116,9 +116,9 @@ function addSpecRow(key = '', val = '') {
   const ed = document.getElementById('specsEditor');
   const d  = document.createElement('div');
   d.className = 'spec-row-edit';
-  d.innerHTML = `<input type="text" placeholder="Параметр" value="${esc(key)}">
-    <input type="text" placeholder="Значение" value="${esc(val)}">
-    <button class="spec-del" onclick="this.parentElement.remove()" title="Удалить">×</button>`;
+  d.innerHTML = `<input type="text" placeholder="${T.phSpecKey}" value="${esc(key)}">
+    <input type="text" placeholder="${T.phSpecVal}" value="${esc(val)}">
+    <button class="spec-del" onclick="this.parentElement.remove()" title="${T.deleteBtn}">×</button>`;
   ed.appendChild(d);
 }
 
@@ -129,13 +129,13 @@ function addEvRow(ev) {
   d.className = 'ev-edit-row';
   d.innerHTML = `<input type="date" class="ev-d" value="${ev.date ? toInputDate(ev.date) : ''}">
     <select class="ev-t">
-      <option value="warranty_claim" ${ev.type === 'warranty_claim' ? 'selected' : ''}>Гарантийный</option>
-      <option value="repair"         ${ev.type === 'repair'         ? 'selected' : ''}>Ремонт</option>
-      <option value="returned"       ${ev.type === 'returned'       ? 'selected' : ''}>Возврат</option>
-      <option value="note"           ${ev.type === 'note'           ? 'selected' : ''}>Заметка</option>
+      <option value="warranty_claim" ${ev.type === 'warranty_claim' ? 'selected' : ''}>${T.evWarrantyOpt}</option>
+      <option value="repair"         ${ev.type === 'repair'         ? 'selected' : ''}>${T.evRepairOpt}</option>
+      <option value="returned"       ${ev.type === 'returned'       ? 'selected' : ''}>${T.evReturnedOpt}</option>
+      <option value="note"           ${ev.type === 'note'           ? 'selected' : ''}>${T.evNoteOpt}</option>
     </select>
-    <input type="text" class="ev-n ev-note-f" placeholder="Описание" value="${esc(ev.note || '')}">
-    <button class="spec-del" onclick="this.parentElement.remove()" title="Удалить">×</button>`;
+    <input type="text" class="ev-n ev-note-f" placeholder="${T.phEvDesc}" value="${esc(ev.note || '')}">
+    <button class="spec-del" onclick="this.parentElement.remove()" title="${T.deleteBtn}">×</button>`;
   ed.appendChild(d);
 }
 
@@ -144,19 +144,21 @@ function addReceiptRow(r) {
   const ed = document.getElementById('receiptsEditor');
   const d  = document.createElement('div');
   d.className = 'receipt-row-edit';
-  const typeOpts = RCPT_TYPES.map(t =>
-    `<option value="${t.value}" ${r.type === t.value ? 'selected' : ''}>${t.label}</option>`
-  ).join('');
+  const typeOpts = [
+    { value: 'url',   label: T.rcptUrl   },
+    { value: 'pdf',   label: T.rcptPdf   },
+    { value: 'photo', label: T.rcptPhoto }
+  ].map(t => `<option value="${t.value}" ${r.type === t.value ? 'selected' : ''}>${t.label}</option>`).join('');
   d.innerHTML = `<select class="rcpt-type">${typeOpts}</select>
-    <input type="text" class="rcpt-label" placeholder="Метка (Чек, Гарантія…)" value="${esc(r.label || '')}">
-    <input type="text" class="rcpt-value" placeholder="URL или имя файла" value="${esc(r.value || '')}">
-    <button class="spec-del" onclick="this.parentElement.remove()" title="Удалить">×</button>`;
+    <input type="text" class="rcpt-label" placeholder="${T.phRcptLbl}" value="${esc(r.label || '')}">
+    <input type="text" class="rcpt-value" placeholder="${T.phRcptVal}" value="${esc(r.value || '')}">
+    <button class="spec-del" onclick="this.parentElement.remove()" title="${T.deleteBtn}">×</button>`;
   ed.appendChild(d);
 }
 
 function saveItem() {
   const name = document.getElementById('fName').value.trim();
-  if (!name) { toast('Введите название', 'err'); return; }
+  if (!name) { toast(T.toastEnterName, 'err'); return; }
 
   const fId   = document.getElementById('fId').value;
   const cat   = document.getElementById('fCat').value;
@@ -223,18 +225,18 @@ function saveItem() {
   markDirty('data');
   buildFilters();
   render();
-  toast(fId ? 'Товар обновлён' : 'Товар добавлен', 'ok');
+  toast(fId ? T.toastItemUpdated : T.toastItemAdded, 'ok');
 }
 
 function deleteItem(id) {
   const it = data.find(x => x.id === id);
-  if (!confirm(`Удалить «${it?.name}»?`)) return;
+  if (!confirm(T.confirmDelete(it?.name))) return;
   data = data.filter(x => x.id !== id);
   openItemIds.delete(id);
   markDirty('data');
   buildFilters();
   render();
-  toast('Удалено');
+  toast(T.toastDeleted);
 }
 
 // ── QUICK EVENT ───────────────────────────────────────────────────────────────
@@ -263,7 +265,7 @@ function saveEvent() {
     const dtr = document.getElementById('dtr-' + id);
     if (dtr) dtr.querySelector('.item-detail').innerHTML = renderDetail(it);
   }
-  toast('Событие добавлено', 'ok');
+  toast(T.toastEventAdded, 'ok');
 }
 
 // ── SHOP CRUD ─────────────────────────────────────────────────────────────────
@@ -282,7 +284,7 @@ function pickColor(c) {
 }
 
 function openAddShop() {
-  document.getElementById('modalShopTitle').textContent = 'Добавить магазин';
+  document.getElementById('modalShopTitle').textContent = T.modalAddShop;
   ['sId', 'sName', 'sUrl', 'sLogin', 'sNote'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sColor').value = '#60a5fa';
   buildColorPresets('#60a5fa');
@@ -292,7 +294,7 @@ function openAddShop() {
 function openEditShop(id) {
   const s = shopById(id);
   if (!s) return;
-  document.getElementById('modalShopTitle').textContent = 'Редактировать магазин';
+  document.getElementById('modalShopTitle').textContent = T.modalEditShop;
   document.getElementById('sId').value    = s.id;
   document.getElementById('sName').value  = s.name || '';
   document.getElementById('sUrl').value   = s.url || '';
@@ -306,7 +308,7 @@ function openEditShop(id) {
 
 function saveShop() {
   const name = document.getElementById('sName').value.trim();
-  if (!name) { toast('Введите название', 'err'); return; }
+  if (!name) { toast(T.toastEnterName, 'err'); return; }
   const fId  = document.getElementById('sId').value;
   const shop = {
     id:    fId || slugify(name),
@@ -327,17 +329,17 @@ function saveShop() {
   markDirty('shops');
   buildFilters();
   renderSettings();
-  toast('Магазин сохранён', 'ok');
+  toast(T.toastShopSaved, 'ok');
 }
 
 function deleteShop(id) {
   const s = shopById(id);
-  if (!confirm(`Удалить магазин «${s?.name}»?`)) return;
+  if (!confirm(T.confirmDelShop(s?.name))) return;
   shops = shops.filter(x => x.id !== id);
   markDirty('shops');
   buildFilters();
   renderSettings();
-  toast('Удалено');
+  toast(T.toastDeleted);
 }
 
 // ── CATEGORY CRUD ─────────────────────────────────────────────────────────────
@@ -350,7 +352,7 @@ function openAddCat() {
 
 function saveCat() {
   const name = document.getElementById('cName').value.trim();
-  if (!name) { toast('Введите название', 'err'); return; }
+  if (!name) { toast(T.toastEnterName, 'err'); return; }
   let id = slugify(name);
   if (cats.some(c => c.id === id)) id += '_' + Date.now().toString(36);
   cats.push({ id, name, isService: document.getElementById('cIsService').checked });
@@ -358,17 +360,17 @@ function saveCat() {
   markDirty('cats');
   buildFilters();
   renderSettings();
-  toast('Категория добавлена', 'ok');
+  toast(T.toastCatAdded, 'ok');
 }
 
 function deleteCat(id) {
-  const c      = cats.find(x => x.id === id);
-  const inUse  = data.some(i => i.category === id);
-  if (inUse && !confirm(`Категория «${c?.name}» используется. Удалить?`)) return;
-  if (!inUse && !confirm(`Удалить категорию «${c?.name}»?`)) return;
+  const c     = cats.find(x => x.id === id);
+  const inUse = data.some(i => i.category === id);
+  if (inUse && !confirm(T.confirmDelCatUsed(c?.name))) return;
+  if (!inUse && !confirm(T.confirmDelCat(c?.name))) return;
   cats = cats.filter(x => x.id !== id);
   markDirty('cats');
   buildFilters();
   renderSettings();
-  toast('Удалено');
+  toast(T.toastDeleted);
 }

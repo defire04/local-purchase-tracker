@@ -11,7 +11,7 @@ function openExportModal() {
 
 function doExport() {
   if (typeof XLSX === 'undefined') {
-    toast('Библиотека xlsx не загружена (нужен интернет)', 'err');
+    toast(T.toastXlsxMissing, 'err');
     return;
   }
 
@@ -41,7 +41,7 @@ function doExport() {
 
   items.sort((a, b) => (parseDate(b.date) || 0) - (parseDate(a.date) || 0));
 
-  if (!items.length) { toast('Нет данных для экспорта', 'err'); return; }
+  if (!items.length) { toast(T.toastNoData, 'err'); return; }
 
   closeModal('modalExport');
   generateExcel(items, from, to);
@@ -49,9 +49,9 @@ function doExport() {
 
 function generateExcel(items, from, to) {
   // ── Palette ────────────────────────────────────────────────────────
-  const HDR_BG    = '0D1E33'; // dark navy
+  const HDR_BG    = '0D1E33';
   const HDR_FG    = 'FFFFFF';
-  const ALT_BG    = 'EEF5FF'; // light blue alternating row
+  const ALT_BG    = 'EEF5FF';
   const BORDER_C  = 'C8D9EE';
   const LINK_C    = '1A6FBF';
   const STATUS_ACTIVE_BG    = 'D1F5E0'; const STATUS_ACTIVE_FG    = '0D5C2E';
@@ -67,25 +67,25 @@ function generateExcel(items, from, to) {
 
   // ── Column definitions ─────────────────────────────────────────────
   const cols = [
-    { key: 'name',        header: 'Название',           w: 36 },
-    { key: 'brand',       header: 'Бренд',              w: 14 },
-    { key: 'category',    header: 'Категория',          w: 16 },
-    { key: 'shop',        header: 'Магазин',            w: 16 },
-    { key: 'order',       header: 'Заказ №',            w: 14 },
-    { key: 'date',        header: 'Дата',               w: 12 },
-    { key: 'price',       header: 'Цена, ₴',           w: 12 },
-    { key: 'warranty',    header: 'Гарантия (мес.)',    w: 10 },
-    { key: 'warrantyEnd', header: 'Гарантия до',        w: 13 },
-    { key: 'serial',      header: 'Серийный №',         w: 18 },
-    { key: 'status',      header: 'Статус',             w: 13 },
-    { key: 'executor',    header: 'Исполнитель',        w: 18 },
-    { key: 'note',        header: 'Примечание',         w: 28 },
-    { key: 'receipts',    header: 'Чеки и документы',  w: 35 },
-    { key: 'link',        header: 'Ссылка на товар',   w: 35 },
-    { key: 'ekLink',      header: 'ek.ua',              w: 30 },
+    { key: 'name',        header: T.exName,      w: 36 },
+    { key: 'brand',       header: T.exBrand,     w: 14 },
+    { key: 'category',    header: T.exCat,       w: 16 },
+    { key: 'shop',        header: T.exShop,      w: 16 },
+    { key: 'order',       header: T.exOrder,     w: 14 },
+    { key: 'date',        header: T.exDate,      w: 12 },
+    { key: 'price',       header: T.exPrice,     w: 12 },
+    { key: 'warranty',    header: T.exWarranty,  w: 10 },
+    { key: 'warrantyEnd', header: T.exWarEnd,    w: 13 },
+    { key: 'serial',      header: T.exSerial,    w: 18 },
+    { key: 'status',      header: T.exStatus,    w: 13 },
+    { key: 'executor',    header: T.exExecutor,  w: 18 },
+    { key: 'note',        header: T.exNote,      w: 28 },
+    { key: 'receipts',    header: T.exReceipts,  w: 35 },
+    { key: 'link',        header: T.exLink,      w: 35 },
+    { key: 'ekLink',      header: T.exEk,        w: 30 },
   ];
 
-  const STATUS_RU = { active: 'Активен', returned: 'Возврат', written_off: 'Списан' };
+  const STATUS_LABELS = { active: T.exSActive, returned: T.exSReturned, written_off: T.exSWrittenOff };
 
   // ── Header row style ───────────────────────────────────────────────
   const hdrS = {
@@ -113,7 +113,6 @@ function generateExcel(items, from, to) {
     const bold = { ...base, font: { ...base.font, bold: true } };
     const link = { ...base, font: { ...base.font, color: { rgb: LINK_C }, underline: true } };
 
-    // status with colour
     const sCode = it.status || 'active';
     const sBgs  = { active: STATUS_ACTIVE_BG, returned: STATUS_RETURNED_BG, written_off: STATUS_WRITTENOFF_BG };
     const sFgs  = { active: STATUS_ACTIVE_FG, returned: STATUS_RETURNED_FG, written_off: STATUS_WRITTENOFF_FG };
@@ -123,12 +122,10 @@ function generateExcel(items, from, to) {
       font: { ...base.font, bold: true, color: { rgb: sFgs[sCode] || '000000' } },
     };
 
-    // dates
     const dateObj = parseDate(it.date);
     const wEnd    = warrantyEnd(it);
     const dateS   = { ...ctr, numFmt: 'DD.MM.YYYY' };
 
-    // receipts text (label: value, one per line)
     const rcptTxt = (it.receipts || [])
       .filter(r => r.value)
       .map(r => {
@@ -156,7 +153,7 @@ function generateExcel(items, from, to) {
       it.warrantyMonths ? n(it.warrantyMonths, ctr, '0') : { v: '', t: 's', s: base },
       wEnd ? { v: wEnd, t: 'd', z: 'DD.MM.YYYY', s: dateS } : { v: '', t: 's', s: base },
       s(it.serialNumber),
-      { v: STATUS_RU[sCode] || sCode, t: 's', s: statusS },
+      { v: STATUS_LABELS[sCode] || sCode, t: 's', s: statusS },
       s(it.executor),
       s(it.note),
       s(rcptTxt, { ...base, alignment: { ...base.alignment, wrapText: true } }),
@@ -168,24 +165,17 @@ function generateExcel(items, from, to) {
   // ── Build worksheet ────────────────────────────────────────────────
   const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-  // Column widths
   ws['!cols'] = cols.map(c => ({ wch: c.w }));
-
-  // Row heights: header taller
   ws['!rows'] = [{ hpt: 26 }];
 
-  // Auto-filter spanning full table
   const lastCol = colLetter(cols.length - 1);
   ws['!autofilter'] = { ref: `A1:${lastCol}${items.length + 1}` };
-
-  // Freeze first row
   ws['!freeze'] = 'A2';
 
-  // Hyperlinks on link / ekLink cells
-  const linkColIdx   = 14; // 0-indexed
+  const linkColIdx   = 14;
   const ekLinkColIdx = 15;
   items.forEach((it, i) => {
-    const r = i + 1; // skip header (row 0)
+    const r = i + 1;
     if (it.link) {
       const ref = XLSX.utils.encode_cell({ r, c: linkColIdx });
       if (ws[ref]) ws[ref].l = { Target: it.link };
@@ -198,15 +188,14 @@ function generateExcel(items, from, to) {
 
   // ── Workbook ───────────────────────────────────────────────────────
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Покупки');
+  XLSX.utils.book_append_sheet(wb, ws, T.navPurchases);
 
-  // ── Filename ───────────────────────────────────────────────────────
   const fFrom = from ? from.replace(/-/g, '.') : '';
   const fTo   = to   ? to.replace(/-/g, '.')   : '';
-  const suffix = fFrom && fTo ? `_${fFrom}–${fTo}` : fFrom ? `_с_${fFrom}` : fTo ? `_до_${fTo}` : '';
-  XLSX.writeFile(wb, `покупки${suffix}.xlsx`);
+  const suffix = fFrom && fTo ? `_${fFrom}–${fTo}` : fFrom ? `_${fFrom}` : fTo ? `_${fTo}` : '';
+  XLSX.writeFile(wb, `purchases${suffix}.xlsx`);
 
-  toast(`Экспортировано: ${items.length} записей`, 'ok');
+  toast(T.toastExported(items.length), 'ok');
 }
 
 function colLetter(idx) {

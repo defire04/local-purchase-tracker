@@ -1,22 +1,9 @@
 'use strict';
 
-const EV_LABELS = {
-  warranty_claim: 'Гарантийный случай',
-  repair:         'Ремонт',
-  returned:       'Возврат',
-  note:           'Заметка'
-};
-
 const COLOR_PALETTE = [
   '#60a5fa','#e879f9','#fb923c','#4ade80','#f87171',
   '#a5b4fc','#67e8f9','#86efac','#fdba74','#fb7185',
   '#fcd34d','#34d399','#f472b6','#818cf8','#38bdf8'
-];
-
-const RCPT_TYPES = [
-  { value: 'url',   label: '🔗 Ссылка' },
-  { value: 'pdf',   label: '📄 PDF'    },
-  { value: 'photo', label: '📷 Фото'   }
 ];
 
 let dirHandle = null, dataFH = null, shopsFH = null, catsFH = null;
@@ -42,16 +29,16 @@ function warrantyEnd(it) {
 }
 
 function warrantyStatus(item) {
-  if (item.status === 'returned')    return { s: 'returned',    label: 'Возврат', end: null };
-  if (item.status === 'written_off') return { s: 'written_off', label: 'Списан',  end: null };
-  if (!item.warrantyMonths)          return { s: 'none',        label: '—',       end: null };
+  if (item.status === 'returned')    return { s: 'returned',    label: T.wBadgeReturned,   end: null };
+  if (item.status === 'written_off') return { s: 'written_off', label: T.wBadgeWrittenOff, end: null };
+  if (!item.warrantyMonths)          return { s: 'none',        label: T.wBadgeNone,        end: null };
   const end = warrantyEnd(item);
-  if (!end) return { s: 'none', label: '—', end: null };
+  if (!end) return { s: 'none', label: T.wBadgeNone, end: null };
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const ml = Math.round((end - today) / (1000 * 60 * 60 * 24 * 30.44));
-  if (ml < 0)  return { s: 'expired', label: 'Истекла',     end };
-  if (ml <= 6) return { s: 'warn',    label: `${ml} мес.`, end };
-  return              { s: 'ok',      label: `${ml} мес.`, end };
+  if (ml < 0)  return { s: 'expired', label: T.wBadgeExpired,          end };
+  if (ml <= 6) return { s: 'warn',    label: `${ml} ${T.months}`,   end };
+  return              { s: 'ok',      label: `${ml} ${T.months}`,   end };
 }
 
 function wBadge(ws) {
@@ -62,7 +49,11 @@ function wBadge(ws) {
 }
 
 function statusBadge(status) {
-  const map = { active:['badge-status-active','Активен'], returned:['badge-status-returned','Возврат'], written_off:['badge-status-written_off','Списан'] };
+  const map = {
+    active:      ['badge-status-active',      T.badgeActive],
+    returned:    ['badge-status-returned',    T.badgeReturned],
+    written_off: ['badge-status-written_off', T.badgeWrittenOff]
+  };
   const [cls, label] = map[status] || ['badge-none', status];
   return `<span class="badge ${cls}">${label}</span>`;
 }
@@ -79,12 +70,12 @@ function defaultShops() { return []; }
 
 function defaultCats() {
   return [
-    { id: 'electronics', name: 'Электроника',    isService: false },
-    { id: 'clothing',    name: 'Одежда',          isService: false },
-    { id: 'furniture',   name: 'Мебель',          isService: false },
-    { id: 'appliances',  name: 'Бытовая техника', isService: false },
-    { id: 'services',    name: 'Услуги',           isService: true  },
-    { id: 'other',       name: 'Разное',           isService: false }
+    { id: 'electronics', name: T.catElectronics, isService: false },
+    { id: 'clothing',    name: T.catClothing,    isService: false },
+    { id: 'furniture',   name: T.catFurniture,   isService: false },
+    { id: 'appliances',  name: T.catAppliances,  isService: false },
+    { id: 'services',    name: T.catServices,    isService: true  },
+    { id: 'other',       name: T.catOther,       isService: false }
   ];
 }
 
@@ -93,9 +84,10 @@ function migrateItem(item) {
     const v = item.receipt;
     const isUrl = /^https?:\/\//.test(v);
     const isPdf = /\.pdf$/i.test(v);
+    const type = isUrl ? 'url' : isPdf ? 'pdf' : 'photo';
     item.receipts = [{
-      type:  isUrl ? 'url' : isPdf ? 'pdf' : 'photo',
-      label: isUrl ? 'Чек' : isPdf ? 'PDF чек' : 'Фото чека',
+      type,
+      label: T.rcptDefaultLabel[type],
       value: v
     }];
     delete item.receipt;

@@ -7,7 +7,7 @@ async function connectDirectory() {
     dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
     await readAllFiles();
   } catch (e) {
-    if (e.name !== 'AbortError') toast('Ошибка открытия папки', 'err');
+    if (e.name !== 'AbortError') toast(T.toastOpenErr, 'err');
   }
 }
 
@@ -41,10 +41,10 @@ async function readAllFiles() {
     shops = Array.isArray(s) && s.length ? s : defaultShops();
     cats  = Array.isArray(c) && c.length ? c : defaultCats();
     showApp();
-    toast(`Загружено: ${data.length} тов., ${shops.length} магазинов`, shops.length ? 'ok' : '');
+    toast(T.toastLoaded(data.length, shops.length), shops.length ? 'ok' : '');
   } catch (e) {
     console.error(e);
-    toast('Ошибка чтения файлов', 'err');
+    toast(T.toastReadErr, 'err');
   }
 }
 
@@ -52,7 +52,6 @@ async function ensureWritePermission() {
   if (!dirHandle) return false;
   const opts = { mode: 'readwrite' };
   if ((await dirHandle.queryPermission(opts)) === 'granted') return true;
-  // requestPermission requires a user gesture — works when called from button click
   try { return (await dirHandle.requestPermission(opts)) === 'granted'; }
   catch { return false; }
 }
@@ -61,7 +60,7 @@ async function saveAll() {
   if (dirHandle) {
     const ok = await ensureWritePermission();
     if (!ok) {
-      toast('Brave заблокировал запись — нажмите «Сохранить» вручную', 'err');
+      toast(T.toastWriteDenied, 'err');
       return;
     }
     try {
@@ -69,11 +68,11 @@ async function saveAll() {
       if (dirty.shops || !shopsFH) { if (!shopsFH) shopsFH = await getOrCreateFH('shops.json');      await writeJSON(shopsFH, shops); }
       if (dirty.cats  || !catsFH)  { if (!catsFH)  catsFH  = await getOrCreateFH('categories.json'); await writeJSON(catsFH,  cats);  }
       clearDirty();
-      toast('Сохранено', 'ok');
+      toast(T.toastSaved, 'ok');
       return;
     } catch (e) {
       console.error('FSA write error:', e);
-      toast(`Ошибка записи: ${e.message}`, 'err');
+      toast(T.toastWriteErr(e.message), 'err');
       return;
     }
   }
@@ -81,7 +80,7 @@ async function saveAll() {
   if (dirty.shops) downloadJSON('shops.json',      shops);
   if (dirty.cats)  downloadJSON('categories.json', cats);
   clearDirty();
-  toast('Файлы скачаны', 'ok');
+  toast(T.toastDownloaded, 'ok');
 }
 
 function downloadJSON(name, obj) {
@@ -103,7 +102,7 @@ function readFileAsJSON(file) {
 async function loadMultipleFiles(files) {
   const find = name => [...files].find(f => f.name === name);
   const df = find('data.json'), sf = find('shops.json'), cf = find('categories.json');
-  if (!df) { toast('Не найден data.json', 'err'); return; }
+  if (!df) { toast(T.toastReadErr, 'err'); return; }
   try {
     const rawD = await readFileAsJSON(df);
     data  = (Array.isArray(rawD) ? rawD : []).map(migrateItem);
@@ -112,6 +111,6 @@ async function loadMultipleFiles(files) {
     if (!Array.isArray(shops) || !shops.length) shops = defaultShops();
     if (!Array.isArray(cats)  || !cats.length)  cats  = defaultCats();
     showApp();
-    toast(`Загружено: ${data.length} тов., ${shops.length} магазинов`, 'ok');
-  } catch { toast('Ошибка чтения файлов', 'err'); }
+    toast(T.toastLoaded(data.length, shops.length), 'ok');
+  } catch { toast(T.toastReadErr, 'err'); }
 }

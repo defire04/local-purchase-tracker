@@ -1450,9 +1450,8 @@ body.modal-open {
   }
 }
 
-/* 960px tablet: wrap controls */
-/* ── TABLET + MOBILE ≤960px — bottom nav bar layout ─────────────── */
-@media (max-width: 960px) {
+/* ── TABLET + MOBILE ≤1100px — bottom nav bar layout ────────────── */
+@media (max-width: 1100px) {
   :root {
     --bottom-bar-h: 64px;
   }

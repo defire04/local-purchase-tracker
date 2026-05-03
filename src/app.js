@@ -167,13 +167,17 @@ function buildFilters() {
   // GroupBy options
   const gSel = document.getElementById('groupBy');
   const gprev = gSel.value;
-  gSel.innerHTML = `
+  const groupOpts = `
     <option value="">${T.groupList}</option>
     <option value="order">${T.groupOrder}</option>
     <option value="shop">${T.groupShop}</option>
     <option value="month">${T.groupMonth}</option>
     <option value="category">${T.groupCat}</option>`;
+  gSel.innerHTML = groupOpts;
   gSel.value = gprev;
+
+  const gSelM = document.getElementById('groupByM');
+  if (gSelM) { gSelM.innerHTML = groupOpts; gSelM.value = gprev; }
 }
 
 function hasTextFilters() {
@@ -202,6 +206,7 @@ function resetAll() {
   sortDir = 'desc';
   [
     'search',
+    'groupBy', 'groupByM',
     'filterCat', 'filterCatM',
     'filterBrand', 'filterBrandM',
     'filterShop', 'filterShopM',
@@ -211,6 +216,7 @@ function resetAll() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  groupBy = '';
   openItemIds.clear();
   updateResetBtn();
   updateFilterCount();
@@ -360,6 +366,8 @@ function closeSidebar() {}
 // ── FILTER SHEET ──────────────────────────────────────────────────────────────
 
 function openFilterSheet() {
+  const gbM = document.getElementById('groupByM');
+  if (gbM) gbM.value = document.getElementById('groupBy').value;
   ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
     const d = document.getElementById('filter' + k);
     const m = document.getElementById('filter' + k + 'M');
@@ -373,6 +381,8 @@ function closeFilterSheet() {
 }
 
 function applyFilterSheet() {
+  const gbM = document.getElementById('groupByM');
+  if (gbM) { document.getElementById('groupBy').value = gbM.value; groupBy = gbM.value; }
   ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
     const m = document.getElementById('filter' + k + 'M');
     const d = document.getElementById('filter' + k);
@@ -386,6 +396,8 @@ function applyFilterSheet() {
 }
 
 function resetFiltersSheet() {
+  ['groupBy', 'groupByM'].forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
+  groupBy = '';
   ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
     ['filter' + k, 'filter' + k + 'M'].forEach((id) => {
       const el = document.getElementById(id);

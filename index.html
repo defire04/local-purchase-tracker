@@ -99,7 +99,7 @@
               <input type="text" id="search" data-i18n-ph="phSearch" placeholder="Search…" />
             </div>
             <div class="ctrl-sep"></div>
-            <select id="groupBy" title="Group by">
+            <select id="groupBy" class="desktop-filter" title="Group by">
               <option value="" data-i18n-opt="groupList">List</option>
               <option value="order" data-i18n-opt="groupOrder">By order</option>
               <option value="shop" data-i18n-opt="groupShop">By shop</option>
@@ -136,7 +136,7 @@
             </button>
             <div class="controls-right">
               <button
-                class="btn btn-ghost btn-sm"
+                class="btn btn-ghost btn-sm desktop-filter"
                 onclick="openExportModal()"
                 title="Export to Excel"
                 data-i18n="excelBtn"
@@ -167,6 +167,16 @@
           <button class="modal-close" onclick="closeFilterSheet()">×</button>
         </div>
         <div class="sheet-body">
+          <div class="form-group">
+            <label data-i18n="lGroupBy">Группировка</label>
+            <select id="groupByM">
+              <option value="" data-i18n-opt="groupList">Список</option>
+              <option value="order" data-i18n-opt="groupOrder">По заказу</option>
+              <option value="shop" data-i18n-opt="groupShop">По магазину</option>
+              <option value="month" data-i18n-opt="groupMonth">По месяцу</option>
+              <option value="category" data-i18n-opt="groupCat">По категории</option>
+            </select>
+          </div>
           <div class="form-group">
             <label data-i18n="lCat">Категория</label>
             <select id="filterCatM"><option value="" data-i18n-opt="allCats">Все категории</option></select>
@@ -205,6 +215,7 @@
           </div>
         </div>
         <div class="sheet-ft">
+          <button class="btn btn-ghost btn-sm" onclick="closeFilterSheet(); openExportModal()" data-i18n="excelBtn">📊 Excel</button>
           <button class="btn btn-ghost btn-sm" onclick="resetFiltersSheet()" data-i18n="resetBtn">✕ Сброс</button>
           <button class="btn btn-primary" onclick="applyFilterSheet()" data-i18n="applyBtn">Применить</button>
         </div>

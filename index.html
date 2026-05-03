@@ -1,368 +1,578 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Purchases Registry</title>
-<link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-
-<!-- ════════════ CONNECT SCREEN ════════════ -->
-<div id="connectScreen">
-  <div class="connect-logo">📦</div>
-  <div class="connect-card">
-    <h1 data-i18n="connectTitle">Purchases Registry</h1>
-    <p class="sub" data-i18n-html="connectSub">Have data files? Open the folder or select them below.<br>First time? Click "Start with empty data".</p>
-    <div class="connect-btns">
-      <button class="btn btn-primary" id="btnOpenDir" style="display:none;flex-direction:column;align-items:flex-start;gap:.1rem">
-        <span data-i18n="connectOpen">📁 Open folder (Chrome / Brave)</span>
-        <span style="font-size:.76rem;font-weight:400;color:rgba(255,255,255,.65)" data-i18n="connectOpenSub">folder with: data.json, shops.json, categories.json</span>
-      </button>
-      <label class="btn btn-secondary" style="cursor:pointer;flex-direction:column;align-items:flex-start;gap:.1rem">
-        <span data-i18n="connectFiles">📄 Select files (Firefox)</span>
-        <span style="font-size:.76rem;font-weight:400;color:var(--text3)" data-i18n="connectFilesSub">select all 3 at once: data.json, shops.json, categories.json</span>
-        <input type="file" id="fileInput" accept=".json" multiple style="display:none">
-      </label>
-      <div class="connect-or" data-i18n="connectOr">or</div>
-      <button class="btn btn-ghost" id="btnEmpty" data-i18n="connectEmpty">Start with empty data</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════ MAIN APP ════════════ -->
-<div id="mainApp">
-
-  <!-- ── SIDEBAR ── -->
-  <nav class="sidebar">
-    <div class="sidebar-logo">
-      <span class="sidebar-logo-icon">📦</span>
-      <span class="sidebar-logo-text"><span data-i18n="appName">Purchases Registry</span></span>
-    </div>
-    <div class="sidebar-nav">
-      <button class="nav-link active" id="tabList" onclick="switchView('list')">
-        <span class="nl-ico">📋</span><span data-i18n="navPurchases">Purchases</span>
-      </button>
-      <button class="nav-link" id="tabSettings" onclick="switchView('settings')">
-        <span class="nl-ico">⚙️</span><span data-i18n="navSettings">Reference</span>
-      </button>
-    </div>
-    <div class="sidebar-footer">
-      <div class="dirty-indicator" id="dirtyBadge">
-        <div class="dirty-dot"></div>
-        <span data-i18n="unsaved">Unsaved</span>
-      </div>
-      <button class="btn btn-secondary btn-sm btn-block" onclick="saveAll()">
-        <span class="btn-ico">💾</span><span class="btn-lbl" data-i18n="save">Save</span>
-      </button>
-      <button class="btn btn-primary btn-sm btn-block" onclick="openAdd()">
-        <span class="btn-ico">✚</span><span class="btn-lbl" data-i18n="addItem">Add item</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ── MAIN CONTENT ── -->
-  <div class="main-content">
-
-    <!-- Controls -->
-    <div class="controls" id="controls">
-      <div class="controls-inner">
-        <div class="search-wrap">
-          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input type="text" id="search" data-i18n-ph="phSearch" placeholder="Search…">
-        </div>
-        <div class="ctrl-sep"></div>
-        <select id="groupBy" title="Group by">
-          <option value="" data-i18n-opt="groupList">List</option>
-          <option value="order" data-i18n-opt="groupOrder">By order</option>
-          <option value="shop" data-i18n-opt="groupShop">By shop</option>
-          <option value="month" data-i18n-opt="groupMonth">By month</option>
-          <option value="category" data-i18n-opt="groupCat">By category</option>
-        </select>
-        <div class="ctrl-sep"></div>
-        <select id="filterCat"><option value="" data-i18n-opt="allCats">All categories</option></select>
-        <select id="filterBrand"><option value="" data-i18n-opt="allBrands">All brands</option></select>
-        <select id="filterShop"><option value="" data-i18n-opt="allShops">All shops</option></select>
-        <select id="filterWarranty">
-          <option value="" data-i18n-opt="allWarranty">All warranty</option>
-          <option value="ok" data-i18n-opt="wActive">Active</option>
-          <option value="warn" data-i18n-opt="w6m">≤ 6 mo</option>
-          <option value="expired" data-i18n-opt="wExpired">Expired</option>
-          <option value="none" data-i18n-opt="wNone">None</option>
-        </select>
-        <select id="filterStatus">
-          <option value="" data-i18n-opt="allStatuses">All statuses</option>
-          <option value="active" data-i18n-opt="sActive">Active</option>
-          <option value="returned" data-i18n-opt="sReturned">Returned</option>
-          <option value="written_off" data-i18n-opt="sWrittenOff">Written off</option>
-        </select>
-        <div class="controls-right">
-          <button class="btn btn-ghost btn-sm" onclick="openExportModal()" title="Export to Excel" data-i18n="excelBtn">📊 Excel</button>
-          <button class="btn-reset" id="btnReset" onclick="resetAll()" data-i18n="resetBtn">✕ Reset</button>
-          <div class="stats-bar"><b id="statCount">0</b> <span data-i18n="positions">items</span> · <b id="statSum">0</b></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Purchases Registry</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <!-- ════════════ CONNECT SCREEN ════════════ -->
+    <div id="connectScreen">
+      <div class="connect-logo">📦</div>
+      <div class="connect-card">
+        <h1 data-i18n="connectTitle">Purchases Registry</h1>
+        <p class="sub" data-i18n-html="connectSub"
+          >Have data files? Open the folder or select them below.<br />First time? Click "Start with
+          empty data".</p
+        >
+        <div class="connect-btns">
+          <button
+            class="btn btn-primary"
+            id="btnOpenDir"
+            style="display: none; flex-direction: column; align-items: flex-start; gap: 0.1rem"
+          >
+            <span data-i18n="connectOpen">📁 Open folder (Chrome / Brave)</span>
+            <span
+              style="font-size: 0.76rem; font-weight: 400; color: rgba(255, 255, 255, 0.65)"
+              data-i18n="connectOpenSub"
+              >folder with: data.json, shops.json, categories.json</span
+            >
+          </button>
+          <label
+            class="btn btn-secondary"
+            style="cursor: pointer; flex-direction: column; align-items: flex-start; gap: 0.1rem"
+          >
+            <span data-i18n="connectFiles">📄 Select files (Firefox)</span>
+            <span
+              style="font-size: 0.76rem; font-weight: 400; color: var(--text3)"
+              data-i18n="connectFilesSub"
+              >select all 3 at once: data.json, shops.json, categories.json</span
+            >
+            <input type="file" id="fileInput" accept=".json" multiple style="display: none" />
+          </label>
+          <div class="connect-or" data-i18n="connectOr">or</div>
+          <button class="btn btn-ghost" id="btnEmpty" data-i18n="connectEmpty"
+            >Start with empty data</button
+          >
         </div>
       </div>
     </div>
 
-    <!-- Views -->
-    <div id="listView"></div>
-    <div class="view" id="settingsView"></div>
-
-  </div><!-- /main-content -->
-</div><!-- /mainApp -->
-
-<!-- ════════════ MODAL: ITEM ════════════ -->
-<div class="modal-backdrop" id="modalItem" style="display:none" onclick="mbClose(event,'modalItem')">
-  <div class="modal">
-    <div class="modal-hd">
-      <h2 id="modalItemTitle">Add item</h2>
-      <button class="modal-close" onclick="closeModal('modalItem')">×</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="fId">
-      <div class="form-row form-row-2">
-        <div class="form-group" style="grid-column:1/-1">
-          <label data-i18n="lName">Name *</label>
-          <input type="text" id="fName" data-i18n-ph="phName" placeholder="Product or service name">
+    <!-- ════════════ MAIN APP ════════════ -->
+    <div id="mainApp">
+      <!-- ── SIDEBAR ── -->
+      <nav class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <span class="sidebar-logo-icon">📦</span>
+          <span class="sidebar-logo-text"><span data-i18n="appName">Purchases Registry</span></span>
         </div>
-        <div class="form-group">
-          <label data-i18n="lCat">Category</label>
-          <select id="fCat" onchange="onCatChange()"></select>
+        <div class="sidebar-nav">
+          <button class="nav-link active" id="tabList" onclick="switchView('list')">
+            <span class="nl-ico">📋</span><span data-i18n="navPurchases">Purchases</span>
+          </button>
+          <button class="nav-link" id="tabSettings" onclick="switchView('settings')">
+            <span class="nl-ico">⚙️</span><span data-i18n="navSettings">Reference</span>
+          </button>
         </div>
-        <div class="form-group" id="fg-brand">
-          <label data-i18n="lBrand">Brand</label>
-          <input type="text" id="fBrand" data-i18n-ph="phBrand" placeholder="ASUS, Samsung…">
-        </div>
-        <div class="form-group">
-          <label data-i18n="lShop">Shop</label>
-          <select id="fShop"></select>
-        </div>
-        <div class="form-group">
-          <label data-i18n="lOrder">Order number</label>
-          <input type="text" id="fOrder" data-i18n-ph="phOrder" placeholder="#123456">
-        </div>
-        <div class="form-group">
-          <label data-i18n="lDate">Purchase date</label>
-          <input type="date" id="fDate">
-        </div>
-        <div class="form-group">
-          <label data-i18n="lPrice">Price (₴)</label>
-          <input type="number" id="fPrice" min="0" step="1" placeholder="0">
-        </div>
-      </div>
-
-      <div id="fg-product">
-        <div class="form-row form-row-2">
-          <div class="form-group">
-            <label data-i18n="lWarrantyM">Warranty (mo.)</label>
-            <input type="number" id="fWarranty" min="0" placeholder="0">
+        <div class="sidebar-footer">
+          <div class="dirty-indicator" id="dirtyBadge">
+            <div class="dirty-dot"></div>
+            <span data-i18n="unsaved">Unsaved</span>
           </div>
-          <div class="form-group">
-            <label data-i18n="lSerial">Serial number</label>
-            <input type="text" id="fSerial" data-i18n-ph="phSerial" placeholder="S/N">
+          <button class="btn btn-secondary btn-sm btn-block" onclick="saveAll()">
+            <span class="btn-ico">💾</span><span class="btn-lbl" data-i18n="save">Save</span>
+          </button>
+          <button class="btn btn-primary btn-sm btn-block" onclick="openAdd()">
+            <span class="btn-ico">✚</span><span class="btn-lbl" data-i18n="addItem">Add item</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Sidebar overlay (mobile) -->
+      <div id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+      <!-- ── MAIN CONTENT ── -->
+      <div class="main-content">
+        <!-- Controls -->
+        <div class="controls" id="controls">
+          <div class="controls-inner">
+            <button class="btn-hamburger" id="btnHamburger" onclick="toggleSidebar()">☰</button>
+            <div class="search-wrap">
+              <svg
+                class="search-ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input type="text" id="search" data-i18n-ph="phSearch" placeholder="Search…" />
+            </div>
+            <div class="ctrl-sep"></div>
+            <select id="groupBy" title="Group by">
+              <option value="" data-i18n-opt="groupList">List</option>
+              <option value="order" data-i18n-opt="groupOrder">By order</option>
+              <option value="shop" data-i18n-opt="groupShop">By shop</option>
+              <option value="month" data-i18n-opt="groupMonth">By month</option>
+              <option value="category" data-i18n-opt="groupCat">By category</option>
+            </select>
+            <div class="ctrl-sep"></div>
+            <select id="filterCat" class="desktop-filter"
+              ><option value="" data-i18n-opt="allCats">All categories</option></select
+            >
+            <select id="filterBrand" class="desktop-filter"
+              ><option value="" data-i18n-opt="allBrands">All brands</option></select
+            >
+            <select id="filterShop" class="desktop-filter"
+              ><option value="" data-i18n-opt="allShops">All shops</option></select
+            >
+            <select id="filterWarranty" class="desktop-filter">
+              <option value="" data-i18n-opt="allWarranty">All warranty</option>
+              <option value="ok" data-i18n-opt="wActive">Active</option>
+              <option value="warn" data-i18n-opt="w6m">≤ 6 mo</option>
+              <option value="expired" data-i18n-opt="wExpired">Expired</option>
+              <option value="none" data-i18n-opt="wNone">None</option>
+            </select>
+            <select id="filterStatus" class="desktop-filter">
+              <option value="" data-i18n-opt="allStatuses">All statuses</option>
+              <option value="active" data-i18n-opt="sActive">Active</option>
+              <option value="returned" data-i18n-opt="sReturned">Returned</option>
+              <option value="written_off" data-i18n-opt="sWrittenOff">Written off</option>
+            </select>
+            <!-- Mobile filter button -->
+            <button class="btn-filter-mobile" id="btnFilterMobile" onclick="openFilterSheet()">
+              <span>⚙</span
+              ><span class="filter-count" id="filterCount" style="display: none"></span>
+            </button>
+            <div class="controls-right">
+              <button
+                class="btn btn-ghost btn-sm"
+                onclick="openExportModal()"
+                title="Export to Excel"
+                data-i18n="excelBtn"
+                >📊 Excel</button
+              >
+              <button class="btn-reset" id="btnReset" onclick="resetAll()" data-i18n="resetBtn"
+                >✕ Reset</button
+              >
+              <div class="stats-bar"
+                ><b id="statCount">0</b> <span data-i18n="positions">items</span> ·
+                <b id="statSum">0</b></div
+              >
+            </div>
           </div>
         </div>
-      </div>
 
-      <div id="fg-executor" style="display:none">
-        <div class="form-group">
-          <label data-i18n="lExecutor">Executor</label>
-          <input type="text" id="fExecutor" data-i18n-ph="phExecutor" placeholder="Company or contractor name">
+        <!-- Views -->
+        <div id="listView"></div>
+        <div class="view" id="settingsView"></div> </div
+      ><!-- /main-content --> </div
+    ><!-- /mainApp -->
+
+    <!-- ════════════ FILTER BOTTOM SHEET (mobile) ════════════ -->
+    <div class="sheet-backdrop" id="filterSheet" style="display: none" onclick="closeFilterSheet()">
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-hd">
+          <span style="font-weight: 700; font-size: 1rem">Фильтры</span>
+          <button class="modal-close" onclick="closeFilterSheet()">×</button>
+        </div>
+        <div class="sheet-body">
+          <div class="form-group">
+            <label data-i18n="allCats">Категория</label>
+            <select id="filterCatM"
+              ><option value="" data-i18n-opt="allCats">All categories</option></select
+            >
+          </div>
+          <div class="form-group">
+            <label data-i18n="allBrands">Бренд</label>
+            <select id="filterBrandM"
+              ><option value="" data-i18n-opt="allBrands">All brands</option></select
+            >
+          </div>
+          <div class="form-group">
+            <label data-i18n="allShops">Магазин</label>
+            <select id="filterShopM"
+              ><option value="" data-i18n-opt="allShops">All shops</option></select
+            >
+          </div>
+          <div class="form-group">
+            <label data-i18n="allWarranty">Гарантия</label>
+            <select id="filterWarrantyM">
+              <option value="" data-i18n-opt="allWarranty">All warranty</option>
+              <option value="ok" data-i18n-opt="wActive">Active</option>
+              <option value="warn" data-i18n-opt="w6m">≤ 6 mo</option>
+              <option value="expired" data-i18n-opt="wExpired">Expired</option>
+              <option value="none" data-i18n-opt="wNone">None</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="allStatuses">Статус</label>
+            <select id="filterStatusM">
+              <option value="" data-i18n-opt="allStatuses">All statuses</option>
+              <option value="active" data-i18n-opt="sActive">Active</option>
+              <option value="returned" data-i18n-opt="sReturned">Returned</option>
+              <option value="written_off" data-i18n-opt="sWrittenOff">Written off</option>
+            </select>
+          </div>
+        </div>
+        <div class="sheet-ft">
+          <button class="btn btn-ghost btn-sm" onclick="resetFiltersSheet()" data-i18n="resetBtn"
+            >✕ Сброс</button
+          >
+          <button class="btn btn-primary" onclick="applyFilterSheet()">Применить</button>
         </div>
       </div>
+    </div>
 
-      <div class="form-group">
-        <label data-i18n="lLink">Product page link</label>
-        <input type="url" id="fLink" data-i18n-ph="phLink" placeholder="https://…">
-      </div>
+    <!-- ════════════ MODAL: ITEM ════════════ -->
+    <div
+      class="modal-backdrop"
+      id="modalItem"
+      style="display: none"
+      onclick="mbClose(event, 'modalItem')"
+    >
+      <div class="modal">
+        <div class="modal-hd">
+          <h2 id="modalItemTitle">Add item</h2>
+          <button class="modal-close" onclick="closeModal('modalItem')">×</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="fId" />
+          <div class="form-row form-row-2">
+            <div class="form-group" style="grid-column: 1/-1">
+              <label data-i18n="lName">Name *</label>
+              <input
+                type="text"
+                id="fName"
+                data-i18n-ph="phName"
+                placeholder="Product or service name"
+              />
+            </div>
+            <div class="form-group">
+              <label data-i18n="lCat">Category</label>
+              <select id="fCat" onchange="onCatChange()"></select>
+            </div>
+            <div class="form-group" id="fg-brand">
+              <label data-i18n="lBrand">Brand</label>
+              <input type="text" id="fBrand" data-i18n-ph="phBrand" placeholder="ASUS, Samsung…" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="lShop">Shop</label>
+              <select id="fShop"></select>
+            </div>
+            <div class="form-group">
+              <label data-i18n="lOrder">Order number</label>
+              <input type="text" id="fOrder" data-i18n-ph="phOrder" placeholder="#123456" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="lDate">Purchase date</label>
+              <input type="date" id="fDate" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="lPrice">Price (₴)</label>
+              <input type="number" id="fPrice" min="0" step="1" placeholder="0" />
+            </div>
+          </div>
 
-      <div id="fg-ek" class="form-group">
-        <label data-i18n="lEkLink">ek.ua link</label>
-        <input type="url" id="fEkLink" data-i18n-ph="phEkLink" placeholder="https://ek.ua/ua/…">
-      </div>
+          <div id="fg-product">
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label data-i18n="lWarrantyM">Warranty (mo.)</label>
+                <input type="number" id="fWarranty" min="0" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label data-i18n="lSerial">Serial number</label>
+                <input type="text" id="fSerial" data-i18n-ph="phSerial" placeholder="S/N" />
+              </div>
+            </div>
+          </div>
 
-      <div class="form-group">
-        <label data-i18n="lReceipts">Receipts &amp; documents</label>
-        <div class="receipts-editor" id="receiptsEditor"></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:.5rem;align-self:flex-start"
-          onclick="addReceiptRow()" data-i18n="addReceiptBtn">+ Add receipt / photo</button>
-      </div>
+          <div id="fg-executor" style="display: none">
+            <div class="form-group">
+              <label data-i18n="lExecutor">Executor</label>
+              <input
+                type="text"
+                id="fExecutor"
+                data-i18n-ph="phExecutor"
+                placeholder="Company or contractor name"
+              />
+            </div>
+          </div>
 
-      <div class="form-row form-row-2">
-        <div class="form-group">
-          <label data-i18n="lStatus">Status</label>
-          <select id="fStatus">
-            <option value="active" data-i18n-opt="optActive">Active</option>
-            <option value="returned" data-i18n-opt="optReturned">Returned</option>
-            <option value="written_off" data-i18n-opt="optWrittenOff">Written off</option>
-          </select>
+          <div class="form-group">
+            <label data-i18n="lLink">Product page link</label>
+            <input type="url" id="fLink" data-i18n-ph="phLink" placeholder="https://…" />
+          </div>
+
+          <div id="fg-ek" class="form-group">
+            <label data-i18n="lEkLink">ek.ua link</label>
+            <input
+              type="url"
+              id="fEkLink"
+              data-i18n-ph="phEkLink"
+              placeholder="https://ek.ua/ua/…"
+            />
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="lReceipts">Receipts &amp; documents</label>
+            <div class="receipts-editor" id="receiptsEditor"></div>
+            <button
+              class="btn btn-ghost btn-sm"
+              style="margin-top: 0.5rem; align-self: flex-start"
+              onclick="addReceiptRow()"
+              data-i18n="addReceiptBtn"
+              >+ Add receipt / photo</button
+            >
+          </div>
+
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label data-i18n="lStatus">Status</label>
+              <select id="fStatus">
+                <option value="active" data-i18n-opt="optActive">Active</option>
+                <option value="returned" data-i18n-opt="optReturned">Returned</option>
+                <option value="written_off" data-i18n-opt="optWrittenOff">Written off</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="lNote">Note</label>
+            <textarea id="fNote" data-i18n-ph="phNote" placeholder="Any notes…"></textarea>
+          </div>
+
+          <div class="form-group" id="fg-specs">
+            <label data-i18n="lSpecs">Specifications</label>
+            <div class="specs-editor" id="specsEditor"></div>
+            <button
+              class="btn btn-ghost btn-sm"
+              style="margin-top: 0.5rem; align-self: flex-start"
+              onclick="addSpecRow()"
+              data-i18n="addSpecBtn"
+              >+ Add</button
+            >
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="lEvents">Event history</label>
+            <div class="events-editor" id="eventsEditor"></div>
+            <button
+              class="btn btn-ghost btn-sm"
+              style="margin-top: 0.5rem; align-self: flex-start"
+              onclick="addEvRow()"
+              data-i18n="addEventBtn"
+              >+ Add event</button
+            >
+          </div>
+        </div>
+        <div class="modal-ft">
+          <button class="btn btn-ghost" onclick="closeModal('modalItem')" data-i18n="cancelBtn"
+            >Cancel</button
+          >
+          <button class="btn btn-primary" onclick="saveItem()" data-i18n="saveBtn">Save</button>
         </div>
       </div>
-
-      <div class="form-group">
-        <label data-i18n="lNote">Note</label>
-        <textarea id="fNote" data-i18n-ph="phNote" placeholder="Any notes…"></textarea>
-      </div>
-
-      <div class="form-group" id="fg-specs">
-        <label data-i18n="lSpecs">Specifications</label>
-        <div class="specs-editor" id="specsEditor"></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:.5rem;align-self:flex-start"
-          onclick="addSpecRow()" data-i18n="addSpecBtn">+ Add</button>
-      </div>
-
-      <div class="form-group">
-        <label data-i18n="lEvents">Event history</label>
-        <div class="events-editor" id="eventsEditor"></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:.5rem;align-self:flex-start"
-          onclick="addEvRow()" data-i18n="addEventBtn">+ Add event</button>
-      </div>
     </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('modalItem')" data-i18n="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" onclick="saveItem()" data-i18n="saveBtn">Save</button>
-    </div>
-  </div>
-</div>
 
-<!-- ════════════ MODAL: SHOP ════════════ -->
-<div class="modal-backdrop" id="modalShop" style="display:none" onclick="mbClose(event,'modalShop')">
-  <div class="modal" style="max-width:460px">
-    <div class="modal-hd">
-      <h2 id="modalShopTitle">Shop</h2>
-      <button class="modal-close" onclick="closeModal('modalShop')">×</button>
-    </div>
-    <div class="modal-body" style="max-height:none">
-      <input type="hidden" id="sId">
-      <div class="form-group"><label data-i18n="lShopName">Name *</label><input type="text" id="sName" data-i18n-ph="phShopName" placeholder="telemart.ua"></div>
-      <div class="form-group"><label data-i18n="lShopUrl">URL</label><input type="url" id="sUrl" placeholder="https://…"></div>
-      <div class="form-group">
-        <label data-i18n="lShopColor">Badge color</label>
-        <div class="color-field">
-          <input type="color" id="sColor" value="#60a5fa">
-          <div class="color-presets" id="colorPresets"></div>
+    <!-- ════════════ MODAL: SHOP ════════════ -->
+    <div
+      class="modal-backdrop"
+      id="modalShop"
+      style="display: none"
+      onclick="mbClose(event, 'modalShop')"
+    >
+      <div class="modal" style="max-width: 460px">
+        <div class="modal-hd">
+          <h2 id="modalShopTitle">Shop</h2>
+          <button class="modal-close" onclick="closeModal('modalShop')">×</button>
+        </div>
+        <div class="modal-body" style="max-height: none">
+          <input type="hidden" id="sId" />
+          <div class="form-group"
+            ><label data-i18n="lShopName">Name *</label
+            ><input type="text" id="sName" data-i18n-ph="phShopName" placeholder="telemart.ua"
+          /></div>
+          <div class="form-group"
+            ><label data-i18n="lShopUrl">URL</label
+            ><input type="url" id="sUrl" placeholder="https://…"
+          /></div>
+          <div class="form-group">
+            <label data-i18n="lShopColor">Badge color</label>
+            <div class="color-field">
+              <input type="color" id="sColor" value="#60a5fa" />
+              <div class="color-presets" id="colorPresets"></div>
+            </div>
+          </div>
+          <div class="form-group"
+            ><label data-i18n="lShopLogin">Login / Email</label><input type="text" id="sLogin"
+          /></div>
+          <div class="form-group"
+            ><label data-i18n="lShopNote">Note</label
+            ><textarea id="sNote" style="min-height: 56px"></textarea>
+          </div>
+        </div>
+        <div class="modal-ft">
+          <button class="btn btn-ghost" onclick="closeModal('modalShop')" data-i18n="cancelBtn"
+            >Cancel</button
+          >
+          <button class="btn btn-primary" onclick="saveShop()" data-i18n="saveBtn">Save</button>
         </div>
       </div>
-      <div class="form-group"><label data-i18n="lShopLogin">Login / Email</label><input type="text" id="sLogin"></div>
-      <div class="form-group"><label data-i18n="lShopNote">Note</label><textarea id="sNote" style="min-height:56px"></textarea></div>
     </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('modalShop')" data-i18n="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" onclick="saveShop()" data-i18n="saveBtn">Save</button>
-    </div>
-  </div>
-</div>
 
-<!-- ════════════ MODAL: CATEGORY ════════════ -->
-<div class="modal-backdrop" id="modalCat" style="display:none" onclick="mbClose(event,'modalCat')">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-hd">
-      <h2 data-i18n="modalAddCat">Add category</h2>
-      <button class="modal-close" onclick="closeModal('modalCat')">×</button>
-    </div>
-    <div class="modal-body" style="max-height:none">
-      <div class="form-group"><label data-i18n="lCatName">Name *</label><input type="text" id="cName" data-i18n-ph="phCatName" placeholder="Sports goods"></div>
-      <div class="form-group" style="flex-direction:row;align-items:center;gap:.75rem;margin-top:.25rem">
-        <input type="checkbox" id="cIsService" style="width:18px;height:18px;cursor:pointer">
-        <label for="cIsService" style="font-size:.9rem;font-weight:500;color:var(--text2);
-          text-transform:none;letter-spacing:0;cursor:pointer" data-i18n="isServiceLbl">
-          This is a service (hide warranty and S/N)
-        </label>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('modalCat')" data-i18n="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" onclick="saveCat()" data-i18n="addCatBtn">Add</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════ MODAL: EVENT ════════════ -->
-<div class="modal-backdrop" id="modalEvent" style="display:none" onclick="mbClose(event,'modalEvent')">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-hd">
-      <h2 data-i18n="modalAddEvent">Add event</h2>
-      <button class="modal-close" onclick="closeModal('modalEvent')">×</button>
-    </div>
-    <div class="modal-body" style="max-height:none">
-      <input type="hidden" id="evItemId">
-      <div class="form-group"><label data-i18n="lEvDate">Date</label><input type="date" id="evDate"></div>
-      <div class="form-group">
-        <label data-i18n="lEvType">Type</label>
-        <select id="evType">
-          <option value="warranty_claim" data-i18n-opt="evWarrantyOpt">Warranty claim</option>
-          <option value="repair" data-i18n-opt="evRepairOpt">Repair</option>
-          <option value="returned" data-i18n-opt="evReturnedOpt">Return</option>
-          <option value="note" data-i18n-opt="evNoteOpt">Note</option>
-        </select>
-      </div>
-      <div class="form-group"><label data-i18n="lEvDesc">Description</label><textarea id="evNote" data-i18n-ph="phEvDesc" placeholder="What happened…"></textarea></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('modalEvent')" data-i18n="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" onclick="saveEvent()" data-i18n="saveBtn">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════ MODAL: EXPORT ════════════ -->
-<div class="modal-backdrop" id="modalExport" style="display:none" onclick="mbClose(event,'modalExport')">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-hd">
-      <h2 data-i18n="modalExportTitle">📊 Export to Excel</h2>
-      <button class="modal-close" onclick="closeModal('modalExport')">×</button>
-    </div>
-    <div class="modal-body" style="max-height:none">
-      <div class="form-row form-row-2">
-        <div class="form-group">
-          <label data-i18n="lExpFrom">From date</label>
-          <input type="date" id="expFrom">
+    <!-- ════════════ MODAL: CATEGORY ════════════ -->
+    <div
+      class="modal-backdrop"
+      id="modalCat"
+      style="display: none"
+      onclick="mbClose(event, 'modalCat')"
+    >
+      <div class="modal" style="max-width: 400px">
+        <div class="modal-hd">
+          <h2 data-i18n="modalAddCat">Add category</h2>
+          <button class="modal-close" onclick="closeModal('modalCat')">×</button>
         </div>
-        <div class="form-group">
-          <label data-i18n="lExpTo">To date</label>
-          <input type="date" id="expTo">
+        <div class="modal-body" style="max-height: none">
+          <div class="form-group"
+            ><label data-i18n="lCatName">Name *</label
+            ><input type="text" id="cName" data-i18n-ph="phCatName" placeholder="Sports goods"
+          /></div>
+          <div
+            class="form-group"
+            style="flex-direction: row; align-items: center; gap: 0.75rem; margin-top: 0.25rem"
+          >
+            <input
+              type="checkbox"
+              id="cIsService"
+              style="width: 18px; height: 18px; cursor: pointer"
+            />
+            <label
+              for="cIsService"
+              style="
+                font-size: 0.9rem;
+                font-weight: 500;
+                color: var(--text2);
+                text-transform: none;
+                letter-spacing: 0;
+                cursor: pointer;
+              "
+              data-i18n="isServiceLbl"
+            >
+              This is a service (hide warranty and S/N)
+            </label>
+          </div>
+        </div>
+        <div class="modal-ft">
+          <button class="btn btn-ghost" onclick="closeModal('modalCat')" data-i18n="cancelBtn"
+            >Cancel</button
+          >
+          <button class="btn btn-primary" onclick="saveCat()" data-i18n="addCatBtn">Add</button>
         </div>
       </div>
-      <div class="form-group">
-        <label data-i18n="lExpScope">Data</label>
-        <select id="expScope">
-          <option value="all" data-i18n-opt="expAll">All records (date range)</option>
-          <option value="active" data-i18n-opt="expActive">Active only</option>
-          <option value="filtered" data-i18n-opt="expFiltered">Current filters</option>
-        </select>
-      </div>
-      <div style="font-size:.82rem;color:var(--text3);line-height:1.6;padding:.1rem 0" data-i18n="expDesc">
-        Exports: name, brand, category, shop, date, price, warranty, serial number, status, receipts, links. No specifications.
+    </div>
+
+    <!-- ════════════ MODAL: EVENT ════════════ -->
+    <div
+      class="modal-backdrop"
+      id="modalEvent"
+      style="display: none"
+      onclick="mbClose(event, 'modalEvent')"
+    >
+      <div class="modal" style="max-width: 440px">
+        <div class="modal-hd">
+          <h2 data-i18n="modalAddEvent">Add event</h2>
+          <button class="modal-close" onclick="closeModal('modalEvent')">×</button>
+        </div>
+        <div class="modal-body" style="max-height: none">
+          <input type="hidden" id="evItemId" />
+          <div class="form-group"
+            ><label data-i18n="lEvDate">Date</label><input type="date" id="evDate"
+          /></div>
+          <div class="form-group">
+            <label data-i18n="lEvType">Type</label>
+            <select id="evType">
+              <option value="warranty_claim" data-i18n-opt="evWarrantyOpt">Warranty claim</option>
+              <option value="repair" data-i18n-opt="evRepairOpt">Repair</option>
+              <option value="returned" data-i18n-opt="evReturnedOpt">Return</option>
+              <option value="note" data-i18n-opt="evNoteOpt">Note</option>
+            </select>
+          </div>
+          <div class="form-group"
+            ><label data-i18n="lEvDesc">Description</label
+            ><textarea id="evNote" data-i18n-ph="phEvDesc" placeholder="What happened…"></textarea>
+          </div>
+        </div>
+        <div class="modal-ft">
+          <button class="btn btn-ghost" onclick="closeModal('modalEvent')" data-i18n="cancelBtn"
+            >Cancel</button
+          >
+          <button class="btn btn-primary" onclick="saveEvent()" data-i18n="saveBtn">Save</button>
+        </div>
       </div>
     </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('modalExport')" data-i18n="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" onclick="doExport()" data-i18n="expExportBtn">📥 Export</button>
+
+    <!-- ════════════ MODAL: EXPORT ════════════ -->
+    <div
+      class="modal-backdrop"
+      id="modalExport"
+      style="display: none"
+      onclick="mbClose(event, 'modalExport')"
+    >
+      <div class="modal" style="max-width: 440px">
+        <div class="modal-hd">
+          <h2 data-i18n="modalExportTitle">📊 Export to Excel</h2>
+          <button class="modal-close" onclick="closeModal('modalExport')">×</button>
+        </div>
+        <div class="modal-body" style="max-height: none">
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label data-i18n="lExpFrom">From date</label>
+              <input type="date" id="expFrom" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="lExpTo">To date</label>
+              <input type="date" id="expTo" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label data-i18n="lExpScope">Data</label>
+            <select id="expScope">
+              <option value="all" data-i18n-opt="expAll">All records (date range)</option>
+              <option value="active" data-i18n-opt="expActive">Active only</option>
+              <option value="filtered" data-i18n-opt="expFiltered">Current filters</option>
+            </select>
+          </div>
+          <div
+            style="font-size: 0.82rem; color: var(--text3); line-height: 1.6; padding: 0.1rem 0"
+            data-i18n="expDesc"
+          >
+            Exports: name, brand, category, shop, date, price, warranty, serial number, status,
+            receipts, links.
+          </div>
+        </div>
+        <div class="modal-ft">
+          <button class="btn btn-ghost" onclick="closeModal('modalExport')" data-i18n="cancelBtn"
+            >Cancel</button
+          >
+          <button class="btn btn-primary" onclick="doExport()" data-i18n="expExportBtn"
+            >📥 Export</button
+          >
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<div id="toast"></div>
+    <div id="toast"></div>
 
-<!-- Fixed language switcher — top-right on all devices -->
-<div id="langBar">
-  <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
-  <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">УК</button>
-  <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-</div>
+    <!-- Fixed language switcher -->
+    <div id="langBar">
+      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
+      <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">УК</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
 
-<!-- ════════════ SCRIPTS ════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-<script src="src/i18n.js"></script>
-<script src="src/utils.js"></script>
-<script src="src/state.js"></script>
-<script src="src/storage.js"></script>
-<script src="src/render.js"></script>
-<script src="src/modals.js"></script>
-<script src="src/export.js"></script>
-<script src="src/app.js"></script>
-
-</body>
+    <!-- ════════════ SCRIPTS ════════════ -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script src="src/i18n.js"></script>
+    <script src="src/utils.js"></script>
+    <script src="src/state.js"></script>
+    <script src="src/storage.js"></script>
+    <script src="src/render.js"></script>
+    <script src="src/modals.js"></script>
+    <script src="src/export.js"></script>
+    <script src="src/app.js"></script>
+  </body>
 </html>

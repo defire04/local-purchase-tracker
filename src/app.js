@@ -8,7 +8,7 @@ function toast(msg, type = '') {
   el.textContent = msg;
   el.className = 'show' + (type ? ' ' + type : '');
   clearTimeout(_toastTm);
-  _toastTm = setTimeout(() => el.className = '', 3200);
+  _toastTm = setTimeout(() => (el.className = ''), 3200);
 }
 
 // ── DIRTY & AUTO-SAVE ────────────────────────────────────────────────────────
@@ -38,11 +38,12 @@ function showApp() {
 }
 
 function switchView(v) {
+  closeSidebar();
   currentView = v;
-  document.getElementById('tabList').classList.toggle('active',     v === 'list');
+  document.getElementById('tabList').classList.toggle('active', v === 'list');
   document.getElementById('tabSettings').classList.toggle('active', v === 'settings');
   document.getElementById('controls').style.display = v === 'list' ? 'flex' : 'none';
-  document.getElementById('listView').classList.toggle('active',     v === 'list');
+  document.getElementById('listView').classList.toggle('active', v === 'list');
   document.getElementById('settingsView').classList.toggle('active', v === 'settings');
   if (v === 'settings') renderSettings();
 }
@@ -51,32 +52,35 @@ function switchView(v) {
 
 function buildFilters() {
   const catSel = document.getElementById('filterCat');
-  const cprev  = catSel.value;
+  const cprev = catSel.value;
   catSel.innerHTML = `<option value="">${T.allCats}</option>`;
-  cats.forEach(c => {
+  cats.forEach((c) => {
     const o = document.createElement('option');
-    o.value = c.id; o.textContent = c.name;
+    o.value = c.id;
+    o.textContent = c.name;
     catSel.appendChild(o);
   });
   catSel.value = cprev;
 
   const brandSel = document.getElementById('filterBrand');
-  const bprev    = brandSel.value;
-  const brands   = [...new Set(data.map(i => i.brand).filter(Boolean))].sort();
+  const bprev = brandSel.value;
+  const brands = [...new Set(data.map((i) => i.brand).filter(Boolean))].sort();
   brandSel.innerHTML = `<option value="">${T.allBrands}</option>`;
-  brands.forEach(b => {
+  brands.forEach((b) => {
     const o = document.createElement('option');
-    o.value = b; o.textContent = b;
+    o.value = b;
+    o.textContent = b;
     brandSel.appendChild(o);
   });
   brandSel.value = bprev;
 
   const shopSel = document.getElementById('filterShop');
-  const sprev   = shopSel.value;
+  const sprev = shopSel.value;
   shopSel.innerHTML = `<option value="">${T.allShops}</option>`;
-  [...new Set(data.map(i => i.shop).filter(Boolean))].sort().forEach(id => {
+  [...new Set(data.map((i) => i.shop).filter(Boolean))].sort().forEach((id) => {
     const o = document.createElement('option');
-    o.value = id; o.textContent = shopName(id);
+    o.value = id;
+    o.textContent = shopName(id);
     shopSel.appendChild(o);
   });
   shopSel.value = sprev;
@@ -115,20 +119,32 @@ function buildFilters() {
 }
 
 function hasTextFilters() {
-  return ['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus']
-    .some(id => document.getElementById(id).value.trim());
+  return [
+    'search',
+    'filterCat',
+    'filterBrand',
+    'filterShop',
+    'filterWarranty',
+    'filterStatus',
+  ].some((id) => document.getElementById(id).value.trim());
 }
 
-function isGroupedMode() { return groupBy !== '' && sortCol === null; }
+function isGroupedMode() {
+  return groupBy !== '' && sortCol === null;
+}
 
 function updateResetBtn() {
-  document.getElementById('btnReset').classList.toggle('visible', sortCol !== null || hasTextFilters());
+  document
+    .getElementById('btnReset')
+    .classList.toggle('visible', sortCol !== null || hasTextFilters());
 }
 
 function resetAll() {
-  sortCol = null; sortDir = 'desc';
-  ['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus']
-    .forEach(id => document.getElementById(id).value = '');
+  sortCol = null;
+  sortDir = 'desc';
+  ['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].forEach(
+    (id) => (document.getElementById(id).value = '')
+  );
   openItemIds.clear();
   updateResetBtn();
   render();
@@ -137,28 +153,36 @@ function resetAll() {
 // ── FILTERING & SORTING ───────────────────────────────────────────────────────
 
 function getFiltered() {
-  const q     = document.getElementById('search').value.toLowerCase().trim();
-  const cat   = document.getElementById('filterCat').value;
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const cat = document.getElementById('filterCat').value;
   const brand = document.getElementById('filterBrand').value;
-  const shop  = document.getElementById('filterShop').value;
-  const wf    = document.getElementById('filterWarranty').value;
-  const sf    = document.getElementById('filterStatus').value;
+  const shop = document.getElementById('filterShop').value;
+  const wf = document.getElementById('filterWarranty').value;
+  const sf = document.getElementById('filterStatus').value;
 
-  let list = data.filter(it => {
+  let list = data.filter((it) => {
     if (q) {
-      const hay = (it.name + ' ' + (it.serialNumber || '') + ' ' + (it.brand || '') + ' ' + (it.note || '')).toLowerCase();
+      const hay = (
+        it.name +
+        ' ' +
+        (it.serialNumber || '') +
+        ' ' +
+        (it.brand || '') +
+        ' ' +
+        (it.note || '')
+      ).toLowerCase();
       if (!hay.includes(q)) return false;
     }
-    if (cat   && it.category !== cat)  return false;
-    if (brand && it.brand    !== brand) return false;
-    if (shop  && it.shop     !== shop)  return false;
-    if (sf    && it.status   !== sf)    return false;
+    if (cat && it.category !== cat) return false;
+    if (brand && it.brand !== brand) return false;
+    if (shop && it.shop !== shop) return false;
+    if (sf && it.status !== sf) return false;
     if (wf) {
       const ws = warrantyStatus(it);
-      if (wf === 'ok'      && ws.s !== 'ok')      return false;
-      if (wf === 'warn'    && ws.s !== 'warn')     return false;
-      if (wf === 'expired' && ws.s !== 'expired')  return false;
-      if (wf === 'none'    && !['none', 'returned', 'written_off'].includes(ws.s)) return false;
+      if (wf === 'ok' && ws.s !== 'ok') return false;
+      if (wf === 'warn' && ws.s !== 'warn') return false;
+      if (wf === 'expired' && ws.s !== 'expired') return false;
+      if (wf === 'none' && !['none', 'returned', 'written_off'].includes(ws.s)) return false;
     }
     return true;
   });
@@ -166,10 +190,10 @@ function getFiltered() {
   if (sortCol) {
     list.sort((a, b) => {
       let cmp = 0;
-      if (sortCol === 'name')     cmp = (a.name  || '').localeCompare(b.name  || '', 'ru');
-      if (sortCol === 'brand')    cmp = (a.brand  || '').localeCompare(b.brand || '', 'ru');
-      if (sortCol === 'date')     cmp = (parseDate(a.date) || 0) - (parseDate(b.date) || 0);
-      if (sortCol === 'price')    cmp = (a.price  || 0) - (b.price || 0);
+      if (sortCol === 'name') cmp = (a.name || '').localeCompare(b.name || '', 'ru');
+      if (sortCol === 'brand') cmp = (a.brand || '').localeCompare(b.brand || '', 'ru');
+      if (sortCol === 'date') cmp = (parseDate(a.date) || 0) - (parseDate(b.date) || 0);
+      if (sortCol === 'price') cmp = (a.price || 0) - (b.price || 0);
       if (sortCol === 'warranty') {
         const ea = warrantyEnd(a)?.getTime() ?? Infinity;
         const eb = warrantyEnd(b)?.getTime() ?? Infinity;
@@ -184,8 +208,12 @@ function getFiltered() {
 }
 
 function handleColSort(col) {
-  if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
-  else { sortCol = col; sortDir = (col === 'date' || col === 'price') ? 'desc' : 'asc'; }
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = col === 'date' || col === 'price' ? 'desc' : 'asc';
+  }
   openItemIds.clear();
   updateResetBtn();
   render();
@@ -193,24 +221,37 @@ function handleColSort(col) {
 
 // ── KEYBOARD ──────────────────────────────────────────────────────────────────
 
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    ['modalItem', 'modalShop', 'modalCat', 'modalEvent'].forEach(id => {
+    ['modalItem', 'modalShop', 'modalCat', 'modalEvent'].forEach((id) => {
       if (document.getElementById(id).style.display !== 'none') closeModal(id);
     });
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAll(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveAll();
+  }
 });
 
 // ── FILTER LISTENERS ──────────────────────────────────────────────────────────
 
-['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].forEach(id => {
-  const el = document.getElementById(id);
-  el.addEventListener('input',  () => { openItemIds.clear(); updateResetBtn(); render(); });
-  el.addEventListener('change', () => { openItemIds.clear(); updateResetBtn(); render(); });
-});
+['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].forEach(
+  (id) => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => {
+      openItemIds.clear();
+      updateResetBtn();
+      render();
+    });
+    el.addEventListener('change', () => {
+      openItemIds.clear();
+      updateResetBtn();
+      render();
+    });
+  }
+);
 
-document.getElementById('groupBy').addEventListener('change', e => {
+document.getElementById('groupBy').addEventListener('change', (e) => {
   groupBy = e.target.value;
   openItemIds.clear();
   render();
@@ -224,19 +265,30 @@ if (HAS_FSA) {
   btn.addEventListener('click', connectDirectory);
 }
 
-document.getElementById('fileInput').addEventListener('change', e => {
+document.getElementById('fileInput').addEventListener('change', (e) => {
   if (e.target.files.length) loadMultipleFiles(e.target.files);
 });
 
 document.getElementById('btnEmpty').addEventListener('click', () => {
-  data = []; shops = defaultShops(); cats = defaultCats();
+  data = [];
+  shops = defaultShops();
+  cats = defaultCats();
   showApp();
 });
 
 document.getElementById('listView').classList.add('active');
 
 // Keep --ctrl-h in sync with actual controls height so sticky thead is always correct
-new ResizeObserver(entries => {
+new ResizeObserver((entries) => {
   const h = entries[0]?.contentRect.height;
   if (h) document.documentElement.style.setProperty('--ctrl-h', h + 'px');
 }).observe(document.getElementById('controls'));
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('visible');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+}

@@ -309,6 +309,7 @@ function renderCatsCard() {
       <div class="sli-sub">${c.id}</div>
     </div>
     <div class="sli-actions">
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="openEditCat('${esc(c.id)}')" title="${T.editBtn}">✏️</button>
       <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCat('${esc(c.id)}')" title="${T.deleteBtn}">🗑</button>
     </div>
   </div>`).join('');

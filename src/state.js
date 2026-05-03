@@ -1,9 +1,30 @@
 'use strict';
 
 const COLOR_PALETTE = [
-  '#60a5fa','#e879f9','#fb923c','#4ade80','#f87171',
-  '#a5b4fc','#67e8f9','#86efac','#fdba74','#fb7185',
-  '#fcd34d','#34d399','#f472b6','#818cf8','#38bdf8'
+  // Reds
+  '#b91c1c','#ef4444','#f87171','#fca5a5',
+  // Pinks / Rose
+  '#e11d48','#fb7185','#f472b6','#ec4899',
+  // Oranges
+  '#c2410c','#f97316','#fb923c','#fdba74',
+  // Yellows
+  '#a16207','#eab308','#fbbf24','#fcd34d',
+  // Greens
+  '#15803d','#22c55e','#4ade80','#86efac',
+  // Emerald / Teal
+  '#047857','#10b981','#34d399','#6ee7b7',
+  // Cyans
+  '#0e7490','#06b6d4','#67e8f9',
+  // Sky / Blues
+  '#1d4ed8','#3b82f6','#60a5fa','#93c5fd','#38bdf8',
+  // Indigo / Violet / Purple
+  '#4338ca','#818cf8','#a5b4fc',
+  '#6d28d9','#8b5cf6','#a78bfa',
+  '#7e22ce','#c084fc',
+  // Fuchsia / Magenta
+  '#a21caf','#e879f9','#d946ef',
+  // Neutrals
+  '#64748b','#94a3b8','#8da0bc',
 ];
 
 let dirHandle = null, dataFH = null, shopsFH = null, catsFH = null;

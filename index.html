@@ -63,7 +63,7 @@
             <span class="nl-ico">📋</span><span data-i18n="navPurchases">Purchases</span>
           </button>
           <button class="nav-link" id="tabSettings" onclick="switchView('settings')">
-            <span class="nl-ico">⚙️</span><span data-i18n="navSettings">Reference</span>
+            <span class="nl-ico">🗂️</span><span data-i18n="navSettings">Reference</span>
           </button>
         </div>
         <div class="sidebar-footer">
@@ -428,7 +428,7 @@
     >
       <div class="modal" style="max-width: 400px">
         <div class="modal-hd">
-          <h2 data-i18n="modalAddCat">Add category</h2>
+          <h2 id="modalCatTitle" data-i18n="modalAddCat">Add category</h2>
           <button class="modal-close" onclick="closeModal('modalCat')">×</button>
         </div>
         <div class="modal-body" style="max-height: none">
@@ -465,7 +465,7 @@
           <button class="btn btn-ghost" onclick="closeModal('modalCat')" data-i18n="cancelBtn"
             >Cancel</button
           >
-          <button class="btn btn-primary" onclick="saveCat()" data-i18n="addCatBtn">Add</button>
+          <button class="btn btn-primary" id="btnSaveCat" onclick="saveCat()" data-i18n="addCatBtn">Add</button>
         </div>
       </div>
     </div>

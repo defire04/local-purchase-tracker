@@ -344,23 +344,46 @@ function deleteShop(id) {
 
 // ── CATEGORY CRUD ─────────────────────────────────────────────────────────────
 
+let _editCatId = null;
+
 function openAddCat() {
+  _editCatId = null;
   document.getElementById('cName').value = '';
   document.getElementById('cIsService').checked = false;
+  document.getElementById('modalCatTitle').textContent = T.modalAddCat;
+  document.getElementById('btnSaveCat').textContent = T.addCatBtn;
+  openModal('modalCat');
+}
+
+function openEditCat(id) {
+  const c = cats.find(x => x.id === id);
+  if (!c) return;
+  _editCatId = id;
+  document.getElementById('cName').value = c.name;
+  document.getElementById('cIsService').checked = !!c.isService;
+  document.getElementById('modalCatTitle').textContent = T.modalEditCat;
+  document.getElementById('btnSaveCat').textContent = T.saveCatBtn;
   openModal('modalCat');
 }
 
 function saveCat() {
   const name = document.getElementById('cName').value.trim();
   if (!name) { toast(T.toastEnterName, 'err'); return; }
-  let id = slugify(name);
-  if (cats.some(c => c.id === id)) id += '_' + Date.now().toString(36);
-  cats.push({ id, name, isService: document.getElementById('cIsService').checked });
+  const isService = document.getElementById('cIsService').checked;
+  if (_editCatId) {
+    const c = cats.find(x => x.id === _editCatId);
+    if (c) { c.name = name; c.isService = isService; }
+  } else {
+    let id = slugify(name);
+    if (cats.some(c => c.id === id)) id += '_' + Date.now().toString(36);
+    cats.push({ id, name, isService });
+  }
   closeModal('modalCat');
   markDirty('cats');
   buildFilters();
   renderSettings();
-  toast(T.toastCatAdded, 'ok');
+  toast(_editCatId ? T.toastSaved : T.toastCatAdded, 'ok');
+  _editCatId = null;
 }
 
 function deleteCat(id) {

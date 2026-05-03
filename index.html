@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Реестр покупок</title>
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+<!-- ════════════ CONNECT SCREEN ════════════ -->
+<div id="connectScreen">
+  <div class="connect-logo">📦</div>
+  <div class="connect-card">
+    <h1>Реестр покупок</h1>
+    <p class="sub">Откройте папку <code>purchases/</code> чтобы загрузить данные.<br>
+      Все изменения сохраняются прямо в JSON-файлы.</p>
+    <div class="connect-btns">
+      <button class="btn btn-primary" id="btnOpenDir" style="display:none">
+        📁 Открыть папку purchases/
+      </button>
+      <label class="btn btn-secondary" style="cursor:pointer;flex-direction:column;align-items:flex-start;gap:.15rem">
+        <span>📄 Выбрать JSON-файлы (Firefox)</span>
+        <span style="font-size:.78rem;font-weight:400;color:var(--text3)">выбрать сразу 3 файла: data.json, shops.json, categories.json</span>
+        <input type="file" id="fileInput" accept=".json" multiple style="display:none">
+      </label>
+      <div class="connect-or">или</div>
+      <button class="btn btn-ghost" id="btnEmpty">Начать с пустыми данными</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MAIN APP ════════════ -->
+<div id="mainApp">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo-icon">📦</span>
+      <span class="sidebar-logo-text"><span>Реестр</span>&nbsp;покупок</span>
+    </div>
+    <div class="sidebar-nav">
+      <button class="nav-link active" id="tabList" onclick="switchView('list')">
+        <span class="nl-ico">📋</span><span>Покупки</span>
+      </button>
+      <button class="nav-link" id="tabSettings" onclick="switchView('settings')">
+        <span class="nl-ico">⚙️</span><span>Справочники</span>
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="dirty-indicator" id="dirtyBadge">
+        <div class="dirty-dot"></div>
+        <span>Несохранено</span>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="saveAll()">
+        💾 Сохранить
+      </button>
+      <button class="btn btn-primary btn-sm btn-block" onclick="openAdd()">
+        + Добавить товар
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main-content">
+
+    <!-- Controls -->
+    <div class="controls" id="controls">
+      <div class="controls-inner">
+        <div class="search-wrap">
+          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="search" placeholder="Поиск…">
+        </div>
+        <div class="ctrl-sep"></div>
+        <select id="groupBy" title="Группировка">
+          <option value="">Список</option>
+          <option value="order">По заказу</option>
+          <option value="shop">По магазину</option>
+          <option value="month">По месяцу</option>
+          <option value="category">По категории</option>
+        </select>
+        <div class="ctrl-sep"></div>
+        <select id="filterCat"><option value="">Все категории</option></select>
+        <select id="filterBrand"><option value="">Все бренды</option></select>
+        <select id="filterShop"><option value="">Все магазины</option></select>
+        <select id="filterWarranty">
+          <option value="">Вся гарантия</option>
+          <option value="ok">Активная</option>
+          <option value="warn">≤ 6 мес</option>
+          <option value="expired">Истекла</option>
+          <option value="none">Нет</option>
+        </select>
+        <select id="filterStatus">
+          <option value="">Все статусы</option>
+          <option value="active">Активные</option>
+          <option value="returned">Возврат</option>
+          <option value="written_off">Списаны</option>
+        </select>
+        <div class="controls-right">
+          <button class="btn btn-ghost btn-sm" onclick="openExportModal()" title="Экспорт в Excel">📊 Excel</button>
+          <button class="btn-reset" id="btnReset" onclick="resetAll()" title="Сбросить">✕ Сброс</button>
+          <div class="stats-bar"><b id="statCount">0</b> поз. · <b id="statSum">0</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Views -->
+    <div id="listView"></div>
+    <div class="view" id="settingsView"></div>
+
+  </div><!-- /main-content -->
+</div><!-- /mainApp -->
+
+<!-- ════════════ MODAL: ITEM ════════════ -->
+<div class="modal-backdrop" id="modalItem" style="display:none" onclick="mbClose(event,'modalItem')">
+  <div class="modal">
+    <div class="modal-hd">
+      <h2 id="modalItemTitle">Добавить товар</h2>
+      <button class="modal-close" onclick="closeModal('modalItem')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fId">
+      <div class="form-row form-row-2">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Название *</label>
+          <input type="text" id="fName" placeholder="Название товара или услуги">
+        </div>
+        <div class="form-group">
+          <label>Категория</label>
+          <select id="fCat" onchange="onCatChange()"></select>
+        </div>
+        <div class="form-group" id="fg-brand">
+          <label>Бренд</label>
+          <input type="text" id="fBrand" placeholder="ASUS, Samsung…">
+        </div>
+        <div class="form-group">
+          <label>Магазин</label>
+          <select id="fShop"></select>
+        </div>
+        <div class="form-group">
+          <label>Номер заказа</label>
+          <input type="text" id="fOrder" placeholder="#123456">
+        </div>
+        <div class="form-group">
+          <label>Дата покупки</label>
+          <input type="date" id="fDate">
+        </div>
+        <div class="form-group">
+          <label>Цена (₴)</label>
+          <input type="number" id="fPrice" min="0" step="1" placeholder="0">
+        </div>
+      </div>
+
+      <div id="fg-product">
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label>Гарантия (мес.)</label>
+            <input type="number" id="fWarranty" min="0" placeholder="0 = не указана">
+          </div>
+          <div class="form-group">
+            <label>Серийный номер</label>
+            <input type="text" id="fSerial" placeholder="S/N">
+          </div>
+        </div>
+      </div>
+
+      <div id="fg-executor" style="display:none">
+        <div class="form-group">
+          <label>Исполнитель</label>
+          <input type="text" id="fExecutor" placeholder="Название компании или мастера">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Ссылка на страницу товара</label>
+        <input type="url" id="fLink" placeholder="https://…">
+      </div>
+
+      <div id="fg-ek" class="form-group">
+        <label>Ссылка ek.ua</label>
+        <input type="url" id="fEkLink" placeholder="https://ek.ua/ua/…">
+      </div>
+
+      <div class="form-group">
+        <label>Чеки и документы</label>
+        <div class="receipts-editor" id="receiptsEditor"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:.5rem;align-self:flex-start"
+          onclick="addReceiptRow()">+ Добавить чек / фото</button>
+      </div>
+
+      <div class="form-row form-row-2">
+        <div class="form-group">
+          <label>Статус</label>
+          <select id="fStatus">
+            <option value="active">Активен</option>
+            <option value="returned">Возврат</option>
+            <option value="written_off">Списан</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Примечание</label>
+        <textarea id="fNote" placeholder="Любые заметки…"></textarea>
+      </div>
+
+      <div class="form-group" id="fg-specs">
+        <label>Характеристики</label>
+        <div class="specs-editor" id="specsEditor"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:.5rem;align-self:flex-start"
+          onclick="addSpecRow()">+ Добавить</button>
+      </div>
+
+      <div class="form-group">
+        <label>История событий</label>
+        <div class="events-editor" id="eventsEditor"></div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:.5rem;align-self:flex-start"
+          onclick="addEvRow()">+ Добавить событие</button>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal('modalItem')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveItem()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: SHOP ════════════ -->
+<div class="modal-backdrop" id="modalShop" style="display:none" onclick="mbClose(event,'modalShop')">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-hd">
+      <h2 id="modalShopTitle">Магазин</h2>
+      <button class="modal-close" onclick="closeModal('modalShop')">×</button>
+    </div>
+    <div class="modal-body" style="max-height:none">
+      <input type="hidden" id="sId">
+      <div class="form-group"><label>Название *</label><input type="text" id="sName" placeholder="telemart.ua"></div>
+      <div class="form-group"><label>URL</label><input type="url" id="sUrl" placeholder="https://…"></div>
+      <div class="form-group">
+        <label>Цвет бейджа</label>
+        <div class="color-field">
+          <input type="color" id="sColor" value="#60a5fa">
+          <div class="color-presets" id="colorPresets"></div>
+        </div>
+      </div>
+      <div class="form-group"><label>Логин / Email</label><input type="text" id="sLogin"></div>
+      <div class="form-group"><label>Заметка</label><textarea id="sNote" style="min-height:56px"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal('modalShop')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveShop()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: CATEGORY ════════════ -->
+<div class="modal-backdrop" id="modalCat" style="display:none" onclick="mbClose(event,'modalCat')">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hd">
+      <h2>Добавить категорию</h2>
+      <button class="modal-close" onclick="closeModal('modalCat')">×</button>
+    </div>
+    <div class="modal-body" style="max-height:none">
+      <div class="form-group"><label>Название *</label><input type="text" id="cName" placeholder="Спортивные товары"></div>
+      <div class="form-group" style="flex-direction:row;align-items:center;gap:.75rem;margin-top:.25rem">
+        <input type="checkbox" id="cIsService" style="width:18px;height:18px;cursor:pointer">
+        <label for="cIsService" style="font-size:.9rem;font-weight:500;color:var(--text2);
+          text-transform:none;letter-spacing:0;cursor:pointer">
+          Это услуга (скрыть гарантию и S/N)
+        </label>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal('modalCat')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveCat()">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: EVENT ════════════ -->
+<div class="modal-backdrop" id="modalEvent" style="display:none" onclick="mbClose(event,'modalEvent')">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-hd">
+      <h2>Добавить событие</h2>
+      <button class="modal-close" onclick="closeModal('modalEvent')">×</button>
+    </div>
+    <div class="modal-body" style="max-height:none">
+      <input type="hidden" id="evItemId">
+      <div class="form-group"><label>Дата</label><input type="date" id="evDate"></div>
+      <div class="form-group">
+        <label>Тип</label>
+        <select id="evType">
+          <option value="warranty_claim">Гарантийный случай</option>
+          <option value="repair">Ремонт</option>
+          <option value="returned">Возврат</option>
+          <option value="note">Заметка</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Описание</label><textarea id="evNote" placeholder="Что произошло…"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal('modalEvent')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: EXPORT ════════════ -->
+<div class="modal-backdrop" id="modalExport" style="display:none" onclick="mbClose(event,'modalExport')">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-hd">
+      <h2>📊 Экспорт в Excel</h2>
+      <button class="modal-close" onclick="closeModal('modalExport')">×</button>
+    </div>
+    <div class="modal-body" style="max-height:none">
+      <div class="form-row form-row-2">
+        <div class="form-group">
+          <label>Дата с</label>
+          <input type="date" id="expFrom">
+        </div>
+        <div class="form-group">
+          <label>Дата по</label>
+          <input type="date" id="expTo">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Данные</label>
+        <select id="expScope">
+          <option value="all">Весь реестр (за период)</option>
+          <option value="active">Только активные</option>
+          <option value="filtered">По текущим фильтрам</option>
+        </select>
+      </div>
+      <div style="font-size:.82rem;color:var(--text3);line-height:1.6;padding:.1rem 0">
+        Экспортируются: название, бренд, категория, магазин, дата, цена,
+        гарантия, серийный номер, статус, чеки, ссылки. Без характеристик.
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal('modalExport')">Отмена</button>
+      <button class="btn btn-primary" onclick="doExport()">📥 Экспортировать</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ════════════ SCRIPTS ════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script src="src/utils.js"></script>
+<script src="src/state.js"></script>
+<script src="src/storage.js"></script>
+<script src="src/render.js"></script>
+<script src="src/modals.js"></script>
+<script src="src/export.js"></script>
+<script src="src/app.js"></script>
+
+</body>
+</html>

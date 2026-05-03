@@ -306,7 +306,6 @@ function renderCatsCard() {
   const rows = cats.map(c => `<div class="settings-list-item">
     <div class="sli-info">
       <div class="sli-name">${esc(c.name)} ${c.isService ? '<span class="tag" style="font-size:.7rem">S</span>' : ''}</div>
-      <div class="sli-sub">${c.id}</div>
     </div>
     <div class="sli-actions">
       <button class="btn btn-ghost btn-sm btn-icon" onclick="openEditCat('${esc(c.id)}')" title="${T.editBtn}">✏️</button>

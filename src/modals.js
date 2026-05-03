@@ -311,7 +311,7 @@ function saveShop() {
   if (!name) { toast(T.toastEnterName, 'err'); return; }
   const fId  = document.getElementById('sId').value;
   const shop = {
-    id:    fId || slugify(name),
+    id:    fId || uid(),
     name,
     url:   document.getElementById('sUrl').value.trim(),
     login: document.getElementById('sLogin').value.trim(),
@@ -322,7 +322,6 @@ function saveShop() {
     const idx = shops.findIndex(s => s.id === fId);
     if (idx >= 0) shops[idx] = shop; else shops.push(shop);
   } else {
-    if (shops.some(s => s.id === shop.id)) shop.id += '_' + Date.now().toString(36);
     shops.push(shop);
   }
   closeModal('modalShop');
@@ -374,9 +373,7 @@ function saveCat() {
     const c = cats.find(x => x.id === _editCatId);
     if (c) { c.name = name; c.isService = isService; }
   } else {
-    let id = slugify(name);
-    if (cats.some(c => c.id === id)) id += '_' + Date.now().toString(36);
-    cats.push({ id, name, isService });
+    cats.push({ id: uid(), name, isService });
   }
   closeModal('modalCat');
   markDirty('cats');

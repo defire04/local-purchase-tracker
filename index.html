@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
     <title>Purchases Registry</title>
     <link rel="stylesheet" href="css/styles.css" />
   </head>
@@ -79,15 +80,11 @@
         </div>
       </nav>
 
-      <!-- Sidebar overlay (mobile) -->
-      <div id="sidebarOverlay" onclick="closeSidebar()"></div>
-
       <!-- ── MAIN CONTENT ── -->
       <div class="main-content">
         <!-- Controls -->
         <div class="controls" id="controls">
           <div class="controls-inner">
-            <button class="btn-hamburger" id="btnHamburger" onclick="toggleSidebar()">☰</button>
             <div class="search-wrap">
               <svg
                 class="search-ico"
@@ -166,53 +163,50 @@
     <div class="sheet-backdrop" id="filterSheet" style="display: none" onclick="closeFilterSheet()">
       <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-hd">
-          <span style="font-weight: 700; font-size: 1rem">Фильтры</span>
+          <span style="font-weight: 700; font-size: 1rem" data-i18n="filtersTitle">Фильтры</span>
           <button class="modal-close" onclick="closeFilterSheet()">×</button>
         </div>
         <div class="sheet-body">
           <div class="form-group">
-            <label data-i18n="allCats">Категория</label>
-            <select id="filterCatM"
-              ><option value="" data-i18n-opt="allCats">All categories</option></select
-            >
+            <label data-i18n="lCat">Категория</label>
+            <select id="filterCatM"><option value="" data-i18n-opt="allCats">Все категории</option></select>
           </div>
           <div class="form-group">
-            <label data-i18n="allBrands">Бренд</label>
-            <select id="filterBrandM"
-              ><option value="" data-i18n-opt="allBrands">All brands</option></select
-            >
+            <label data-i18n="lBrand">Бренд</label>
+            <select id="filterBrandM"><option value="" data-i18n-opt="allBrands">Все бренды</option></select>
           </div>
           <div class="form-group">
-            <label data-i18n="allShops">Магазин</label>
-            <select id="filterShopM"
-              ><option value="" data-i18n-opt="allShops">All shops</option></select
-            >
+            <label data-i18n="lShop">Магазин</label>
+            <select id="filterShopM"><option value="" data-i18n-opt="allShops">Все магазины</option></select>
           </div>
           <div class="form-group">
-            <label data-i18n="allWarranty">Гарантия</label>
+            <label data-i18n="colWarranty">Гарантия</label>
             <select id="filterWarrantyM">
-              <option value="" data-i18n-opt="allWarranty">All warranty</option>
-              <option value="ok" data-i18n-opt="wActive">Active</option>
-              <option value="warn" data-i18n-opt="w6m">≤ 6 mo</option>
-              <option value="expired" data-i18n-opt="wExpired">Expired</option>
-              <option value="none" data-i18n-opt="wNone">None</option>
+              <option value="" data-i18n-opt="allWarranty">Вся гарантия</option>
+              <option value="ok" data-i18n-opt="wActive">Активная</option>
+              <option value="warn" data-i18n-opt="w6m">≤ 6 мес</option>
+              <option value="expired" data-i18n-opt="wExpired">Истекла</option>
+              <option value="none" data-i18n-opt="wNone">Нет</option>
             </select>
           </div>
           <div class="form-group">
-            <label data-i18n="allStatuses">Статус</label>
+            <label data-i18n="colStatus">Статус</label>
             <select id="filterStatusM">
-              <option value="" data-i18n-opt="allStatuses">All statuses</option>
-              <option value="active" data-i18n-opt="sActive">Active</option>
-              <option value="returned" data-i18n-opt="sReturned">Returned</option>
-              <option value="written_off" data-i18n-opt="sWrittenOff">Written off</option>
+              <option value="" data-i18n-opt="allStatuses">Все статусы</option>
+              <option value="active" data-i18n-opt="sActive">Активные</option>
+              <option value="returned" data-i18n-opt="sReturned">Возврат</option>
+              <option value="written_off" data-i18n-opt="sWrittenOff">Списаны</option>
             </select>
+          </div>
+          <div class="sheet-lang">
+            <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
+            <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">УК</button>
+            <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
           </div>
         </div>
         <div class="sheet-ft">
-          <button class="btn btn-ghost btn-sm" onclick="resetFiltersSheet()" data-i18n="resetBtn"
-            >✕ Сброс</button
-          >
-          <button class="btn btn-primary" onclick="applyFilterSheet()">Применить</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetFiltersSheet()" data-i18n="resetBtn">✕ Сброс</button>
+          <button class="btn btn-primary" onclick="applyFilterSheet()" data-i18n="applyBtn">Применить</button>
         </div>
       </div>
     </div>

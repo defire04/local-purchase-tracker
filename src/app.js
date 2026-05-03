@@ -62,9 +62,21 @@ function buildFilters() {
   });
   catSel.value = cprev;
 
+  const catSelM = document.getElementById('filterCatM');
+  if (catSelM) {
+    catSelM.innerHTML = `<option value="">${T.allCats}</option>`;
+    cats.forEach((c) => {
+      const o = document.createElement('option');
+      o.value = c.id;
+      o.textContent = c.name;
+      catSelM.appendChild(o);
+    });
+    catSelM.value = cprev;
+  }
+
+  const brands = [...new Set(data.map((i) => i.brand).filter(Boolean))].sort();
   const brandSel = document.getElementById('filterBrand');
   const bprev = brandSel.value;
-  const brands = [...new Set(data.map((i) => i.brand).filter(Boolean))].sort();
   brandSel.innerHTML = `<option value="">${T.allBrands}</option>`;
   brands.forEach((b) => {
     const o = document.createElement('option');
@@ -74,16 +86,41 @@ function buildFilters() {
   });
   brandSel.value = bprev;
 
+  const brandSelM = document.getElementById('filterBrandM');
+  if (brandSelM) {
+    brandSelM.innerHTML = `<option value="">${T.allBrands}</option>`;
+    brands.forEach((b) => {
+      const o = document.createElement('option');
+      o.value = b;
+      o.textContent = b;
+      brandSelM.appendChild(o);
+    });
+    brandSelM.value = bprev;
+  }
+
+  const shopIds = [...new Set(data.map((i) => i.shop).filter(Boolean))].sort();
   const shopSel = document.getElementById('filterShop');
   const sprev = shopSel.value;
   shopSel.innerHTML = `<option value="">${T.allShops}</option>`;
-  [...new Set(data.map((i) => i.shop).filter(Boolean))].sort().forEach((id) => {
+  shopIds.forEach((id) => {
     const o = document.createElement('option');
     o.value = id;
     o.textContent = shopName(id);
     shopSel.appendChild(o);
   });
   shopSel.value = sprev;
+
+  const shopSelM = document.getElementById('filterShopM');
+  if (shopSelM) {
+    shopSelM.innerHTML = `<option value="">${T.allShops}</option>`;
+    shopIds.forEach((id) => {
+      const o = document.createElement('option');
+      o.value = id;
+      o.textContent = shopName(id);
+      shopSelM.appendChild(o);
+    });
+    shopSelM.value = sprev;
+  }
 
   // Warranty filter options
   const wSel = document.getElementById('filterWarranty');
@@ -96,6 +133,17 @@ function buildFilters() {
     <option value="none">${T.wNone}</option>`;
   wSel.value = wprev;
 
+  const wSelM = document.getElementById('filterWarrantyM');
+  if (wSelM) {
+    wSelM.innerHTML = `
+      <option value="">${T.allWarranty}</option>
+      <option value="ok">${T.wActive}</option>
+      <option value="warn">${T.w6m}</option>
+      <option value="expired">${T.wExpired}</option>
+      <option value="none">${T.wNone}</option>`;
+    wSelM.value = wprev;
+  }
+
   // Status filter options
   const sSel = document.getElementById('filterStatus');
   const sprevS = sSel.value;
@@ -105,6 +153,16 @@ function buildFilters() {
     <option value="returned">${T.sReturned}</option>
     <option value="written_off">${T.sWrittenOff}</option>`;
   sSel.value = sprevS;
+
+  const sSelM = document.getElementById('filterStatusM');
+  if (sSelM) {
+    sSelM.innerHTML = `
+      <option value="">${T.allStatuses}</option>
+      <option value="active">${T.sActive}</option>
+      <option value="returned">${T.sReturned}</option>
+      <option value="written_off">${T.sWrittenOff}</option>`;
+    sSelM.value = sprevS;
+  }
 
   // GroupBy options
   const gSel = document.getElementById('groupBy');
@@ -142,11 +200,20 @@ function updateResetBtn() {
 function resetAll() {
   sortCol = null;
   sortDir = 'desc';
-  ['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].forEach(
-    (id) => (document.getElementById(id).value = '')
-  );
+  [
+    'search',
+    'filterCat', 'filterCatM',
+    'filterBrand', 'filterBrandM',
+    'filterShop', 'filterShopM',
+    'filterWarranty', 'filterWarrantyM',
+    'filterStatus', 'filterStatusM',
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   openItemIds.clear();
   updateResetBtn();
+  updateFilterCount();
   render();
 }
 
@@ -223,6 +290,8 @@ function handleColSort(col) {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    const sheet = document.getElementById('filterSheet');
+    if (sheet && sheet.style.display !== 'none') { closeFilterSheet(); return; }
     ['modalItem', 'modalShop', 'modalCat', 'modalEvent'].forEach((id) => {
       if (document.getElementById(id).style.display !== 'none') closeModal(id);
     });
@@ -241,11 +310,13 @@ document.addEventListener('keydown', (e) => {
     el.addEventListener('input', () => {
       openItemIds.clear();
       updateResetBtn();
+      updateFilterCount();
       render();
     });
     el.addEventListener('change', () => {
       openItemIds.clear();
       updateResetBtn();
+      updateFilterCount();
       render();
     });
   }
@@ -284,11 +355,57 @@ new ResizeObserver((entries) => {
   if (h) document.documentElement.style.setProperty('--ctrl-h', h + 'px');
 }).observe(document.getElementById('controls'));
 
-function toggleSidebar() {
-  document.querySelector('.sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('visible');
+function closeSidebar() {}
+
+// ── FILTER SHEET ──────────────────────────────────────────────────────────────
+
+function openFilterSheet() {
+  ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
+    const d = document.getElementById('filter' + k);
+    const m = document.getElementById('filter' + k + 'M');
+    if (d && m) m.value = d.value;
+  });
+  document.getElementById('filterSheet').style.display = 'flex';
 }
-function closeSidebar() {
-  document.querySelector('.sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('visible');
+
+function closeFilterSheet() {
+  document.getElementById('filterSheet').style.display = 'none';
 }
+
+function applyFilterSheet() {
+  ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
+    const m = document.getElementById('filter' + k + 'M');
+    const d = document.getElementById('filter' + k);
+    if (m && d) d.value = m.value;
+  });
+  openItemIds.clear();
+  updateResetBtn();
+  updateFilterCount();
+  render();
+  closeFilterSheet();
+}
+
+function resetFiltersSheet() {
+  ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
+    ['filter' + k, 'filter' + k + 'M'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  });
+  openItemIds.clear();
+  updateResetBtn();
+  updateFilterCount();
+  render();
+}
+
+function updateFilterCount() {
+  const n = ['filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].filter(
+    (id) => document.getElementById(id)?.value
+  ).length;
+  const badge = document.getElementById('filterCount');
+  const btn = document.getElementById('btnFilterMobile');
+  if (badge) { badge.textContent = n; badge.style.display = n ? 'flex' : 'none'; }
+  if (btn) btn.classList.toggle('has-filters', n > 0);
+}
+
+updateFilterCount();

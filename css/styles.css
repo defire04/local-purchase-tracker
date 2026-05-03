@@ -414,37 +414,6 @@ textarea {
   }
 }
 
-/* Sidebar overlay */
-#sidebarOverlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 55;
-}
-#sidebarOverlay.visible {
-  display: block;
-}
-
-/* ── HAMBURGER ───────────────────────────────────────────────────── */
-.btn-hamburger {
-  display: none;
-  background: none;
-  border: 1px solid var(--border2);
-  color: var(--text2);
-  border-radius: var(--r8);
-  padding: 0.35rem 0.55rem;
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
-.btn-hamburger:hover {
-  background: var(--bg3);
-  color: var(--text);
-}
-
 /* ── LANGUAGE BAR ────────────────────────────────────────────────── */
 #langBar {
   position: fixed;

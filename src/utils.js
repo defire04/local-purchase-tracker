@@ -6,9 +6,6 @@ function uid() {
     : Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
-function slugify(s) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/, '');
-}
 
 function esc(s) {
   if (s == null) return '';

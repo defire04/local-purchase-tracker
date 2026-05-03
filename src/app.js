@@ -38,7 +38,6 @@ function showApp() {
 }
 
 function switchView(v) {
-  closeSidebar();
   currentView = v;
   document.getElementById('tabList').classList.toggle('active', v === 'list');
   document.getElementById('tabSettings').classList.toggle('active', v === 'settings');
@@ -360,8 +359,6 @@ new ResizeObserver((entries) => {
   const h = entries[0]?.contentRect.height;
   if (h) document.documentElement.style.setProperty('--ctrl-h', h + 'px');
 }).observe(document.getElementById('controls'));
-
-function closeSidebar() {}
 
 // ── FILTER SHEET ──────────────────────────────────────────────────────────────
 

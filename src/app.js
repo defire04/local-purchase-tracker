@@ -234,3 +234,9 @@ document.getElementById('btnEmpty').addEventListener('click', () => {
 });
 
 document.getElementById('listView').classList.add('active');
+
+// Keep --ctrl-h in sync with actual controls height so sticky thead is always correct
+new ResizeObserver(entries => {
+  const h = entries[0]?.contentRect.height;
+  if (h) document.documentElement.style.setProperty('--ctrl-h', h + 'px');
+}).observe(document.getElementById('controls'));

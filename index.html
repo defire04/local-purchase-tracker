@@ -13,14 +13,15 @@
   <div class="connect-logo">📦</div>
   <div class="connect-card">
     <h1 data-i18n="connectTitle">Purchases Registry</h1>
-    <p class="sub" data-i18n-html="connectSub">Open the <code>purchases/</code> folder to load your data.<br>All changes are saved directly to JSON files.</p>
+    <p class="sub" data-i18n-html="connectSub">Have data files? Open the folder or select them below.<br>First time? Click "Start with empty data".</p>
     <div class="connect-btns">
-      <button class="btn btn-primary" id="btnOpenDir" style="display:none" data-i18n="connectOpen">
-        📁 Open purchases/ folder
+      <button class="btn btn-primary" id="btnOpenDir" style="display:none;flex-direction:column;align-items:flex-start;gap:.1rem">
+        <span data-i18n="connectOpen">📁 Open folder (Chrome / Brave)</span>
+        <span style="font-size:.76rem;font-weight:400;color:rgba(255,255,255,.65)" data-i18n="connectOpenSub">folder with: data.json, shops.json, categories.json</span>
       </button>
-      <label class="btn btn-secondary" style="cursor:pointer;flex-direction:column;align-items:flex-start;gap:.15rem">
-        <span data-i18n="connectFiles">📄 Select JSON files (Firefox)</span>
-        <span style="font-size:.78rem;font-weight:400;color:var(--text3)" data-i18n="connectFilesSub">select all 3 files at once: data.json, shops.json, categories.json</span>
+      <label class="btn btn-secondary" style="cursor:pointer;flex-direction:column;align-items:flex-start;gap:.1rem">
+        <span data-i18n="connectFiles">📄 Select files (Firefox)</span>
+        <span style="font-size:.76rem;font-weight:400;color:var(--text3)" data-i18n="connectFilesSub">select all 3 at once: data.json, shops.json, categories.json</span>
         <input type="file" id="fileInput" accept=".json" multiple style="display:none">
       </label>
       <div class="connect-or" data-i18n="connectOr">or</div>
@@ -47,20 +48,15 @@
       </button>
     </div>
     <div class="sidebar-footer">
-      <div class="lang-switcher">
-        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
-        <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">УК</button>
-        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-      </div>
       <div class="dirty-indicator" id="dirtyBadge">
         <div class="dirty-dot"></div>
         <span data-i18n="unsaved">Unsaved</span>
       </div>
-      <button class="btn btn-secondary btn-sm btn-block" onclick="saveAll()" data-i18n="save">
-        💾 Save
+      <button class="btn btn-secondary btn-sm btn-block" onclick="saveAll()">
+        <span class="btn-ico">💾</span><span class="btn-lbl" data-i18n="save">Save</span>
       </button>
-      <button class="btn btn-primary btn-sm btn-block" onclick="openAdd()" data-i18n="addItem">
-        + Add item
+      <button class="btn btn-primary btn-sm btn-block" onclick="openAdd()">
+        <span class="btn-ico">✚</span><span class="btn-lbl" data-i18n="addItem">Add item</span>
       </button>
     </div>
   </nav>
@@ -349,6 +345,13 @@
 </div>
 
 <div id="toast"></div>
+
+<!-- Fixed language switcher — top-right on all devices -->
+<div id="langBar">
+  <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
+  <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">УК</button>
+  <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+</div>
 
 <!-- ════════════ SCRIPTS ════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>

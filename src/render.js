@@ -145,6 +145,7 @@ function renderItemTr(it, gid) {
     onclick="toggleItem('${it.id}')">
     <td class="td-name"><div class="td-name-inner"><span>${esc(it.name)}</span>
       ${it.serialNumber ? `<code style="font-size:.78rem">🔑 ${esc(it.serialNumber)}</code>` : ''}
+      <div class="mobile-meta"><span class="mm-price">${fmtPrice(it.price)}</span><span class="mm-warranty">${wBadge(ws)}</span>${statusBadge(it.status)}</div>
     </div></td>
     <td class="td-brand col-brand">${esc(it.brand || '')}</td>
     <td class="td-shop col-shop">${gid ? '' : shopBadge(it.shop) + (it.order ? ` <span class="order-num">${esc(it.order)}</span>` : '')}</td>

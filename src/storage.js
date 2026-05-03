@@ -76,9 +76,9 @@ async function saveAll() {
       return;
     }
   }
-  if (dirty.data)  downloadJSON('data.json',       data);
-  if (dirty.shops) downloadJSON('shops.json',      shops);
-  if (dirty.cats)  downloadJSON('categories.json', cats);
+  downloadJSON('data.json',       data);
+  downloadJSON('shops.json',      shops);
+  downloadJSON('categories.json', cats);
   clearDirty();
   toast(T.toastDownloaded, 'ok');
 }

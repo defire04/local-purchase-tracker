@@ -198,8 +198,8 @@ const LANGS = {
     phSpecKey: 'Параметр',
     phSpecVal: 'Значение',
     phEvDesc: 'Что произошло…',
-    phCatName: 'Спортивные товары',
-    phShopName: 'telemart.ua',
+    phCatName: '',
+    phShopName: '',
     // Export columns
     exName: 'Название',
     exBrand: 'Бренд',
@@ -220,13 +220,6 @@ const LANGS = {
     exSActive: 'Активен',
     exSReturned: 'Возврат',
     exSWrittenOff: 'Списан',
-    // Default categories
-    catElectronics: 'Электроника',
-    catClothing: 'Одежда',
-    catFurniture: 'Мебель',
-    catAppliances: 'Бытовая техника',
-    catServices: 'Услуги',
-    catOther: 'Разное',
   },
 
   uk: {
@@ -406,8 +399,8 @@ const LANGS = {
     phSpecKey: 'Параметр',
     phSpecVal: 'Значення',
     phEvDesc: 'Що сталося…',
-    phCatName: 'Спортивні товари',
-    phShopName: 'telemart.ua',
+    phCatName: '',
+    phShopName: '',
     exName: 'Назва',
     exBrand: 'Бренд',
     exCat: 'Категорія',
@@ -427,12 +420,6 @@ const LANGS = {
     exSActive: 'Активний',
     exSReturned: 'Повернення',
     exSWrittenOff: 'Списаний',
-    catElectronics: 'Електроніка',
-    catClothing: 'Одяг',
-    catFurniture: 'Меблі',
-    catAppliances: 'Побутова техніка',
-    catServices: 'Послуги',
-    catOther: 'Різне',
   },
 
   en: {
@@ -612,8 +599,8 @@ const LANGS = {
     phSpecKey: 'Parameter',
     phSpecVal: 'Value',
     phEvDesc: 'What happened…',
-    phCatName: 'Sports goods',
-    phShopName: 'amazon.com',
+    phCatName: '',
+    phShopName: '',
     exName: 'Name',
     exBrand: 'Brand',
     exCat: 'Category',
@@ -633,12 +620,6 @@ const LANGS = {
     exSActive: 'Active',
     exSReturned: 'Returned',
     exSWrittenOff: 'Written off',
-    catElectronics: 'Electronics',
-    catClothing: 'Clothing',
-    catFurniture: 'Furniture',
-    catAppliances: 'Appliances',
-    catServices: 'Services',
-    catOther: 'Other',
   },
 };
 

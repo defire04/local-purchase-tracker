@@ -89,16 +89,7 @@ function shopBadge(shopId) {
 
 function defaultShops() { return []; }
 
-function defaultCats() {
-  return [
-    { id: 'electronics', name: T.catElectronics, isService: false },
-    { id: 'clothing',    name: T.catClothing,    isService: false },
-    { id: 'furniture',   name: T.catFurniture,   isService: false },
-    { id: 'appliances',  name: T.catAppliances,  isService: false },
-    { id: 'services',    name: T.catServices,    isService: true  },
-    { id: 'other',       name: T.catOther,       isService: false }
-  ];
-}
+function defaultCats() { return []; }
 
 function migrateItem(item) {
   if (item.receipt && !item.receipts) {

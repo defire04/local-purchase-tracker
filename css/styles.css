@@ -1450,8 +1450,8 @@ body.modal-open {
   }
 }
 
-/* ── TABLET + MOBILE ≤1200px — bottom nav bar layout ────────────── */
-@media (max-width: 1200px) {
+/* ── TABLET + MOBILE ≤1400px — bottom nav bar layout ────────────── */
+@media (max-width: 1400px) {
   :root {
     --bottom-bar-h: 64px;
   }

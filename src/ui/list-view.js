@@ -1,9 +1,7 @@
 'use strict';
 
-// ── TABLE ─────────────────────────────────────────────────────────────────────
-
 function render() {
-  if (currentView !== 'list') return;
+  if (Store.currentView !== 'list') return;
   const list  = getFiltered();
   const total = list.reduce((s, i) => s + (i.price || 0), 0);
   document.getElementById('statCount').textContent = list.length;
@@ -28,11 +26,11 @@ function render() {
 
   const colgroup = `<colgroup>${cols.map(c => `<col class="${c.cls}">`).join('')}</colgroup>`;
   const thead = `<thead><tr>${cols.map(c => {
-    const active = sortCol === c.id;
-    const ico    = active ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
+    const active = Store.sortCol === c.id;
+    const ico    = active ? (Store.sortDir === 'asc' ? '↑' : '↓') : '↕';
     const sc     = c.sortable ? ('th-sort' + (active ? ' active' : '')) : '';
-    const oc     = c.sortable ? `onclick="handleColSort('${c.id}')"` : '';
-    return `<th class="th-${c.id} ${c.cls} ${sc}" ${oc}>${esc(c.label)}${c.sortable ? `<i class="sort-ico">${ico}</i>` : ''}</th>`;
+    const da     = c.sortable ? `data-action="sort-col" data-col="${c.id}"` : '';
+    return `<th class="th-${c.id} ${c.cls} ${sc}" ${da}>${esc(c.label)}${c.sortable ? `<i class="sort-ico">${ico}</i>` : ''}</th>`;
   }).join('')}</tr></thead>`;
 
   let tbody = '<tbody>';
@@ -43,10 +41,8 @@ function render() {
   el.innerHTML = `<table class="items-table">${colgroup}${thead}${tbody}</table>`;
 }
 
-// ── GROUPED ROWS ──────────────────────────────────────────────────────────────
-
 function getGroupKey(it) {
-  switch (groupBy) {
+  switch (Store.groupBy) {
     case 'order':    return (it.shop || '—') + '||' + (it.order || '');
     case 'shop':     return it.shop || '—';
     case 'month': {
@@ -73,24 +69,24 @@ function renderGroupedRows(list) {
   });
 
   const locale = lang === 'uk' ? 'uk-UA' : lang === 'en' ? 'en-US' : 'ru-RU';
-
   let html = '';
+
   groups.forEach(g => {
-    const gid     = 'g' + g.key.replace(/[^a-z0-9]/gi, '_');
-    const sum     = g.items.reduce((s, i) => s + (i.price || 0), 0);
+    const gid        = 'g' + g.key.replace(/[^a-z0-9]/gi, '_');
+    const sum        = g.items.reduce((s, i) => s + (i.price || 0), 0);
     const latestDate = g.items.reduce((best, i) => {
       const t = parseDate(i.date)?.getTime() || 0;
       return t > (parseDate(best)?.getTime() || 0) ? i.date : best;
     }, '');
 
-    const shopId    = groupBy === 'order' || groupBy === 'shop' ? (g.items[0]?.shop || null) : null;
+    const shopId    = Store.groupBy === 'order' || Store.groupBy === 'shop' ? (g.items[0]?.shop || null) : null;
     const shopColor = shopId ? (shopById(shopId)?.color || null) : null;
     const tdStyle   = shopColor
       ? `background:${hexToRgba(shopColor, 0.1)};border-left:3px solid ${hexToRgba(shopColor, 0.55)};`
       : 'background:var(--bg3);border-left:3px solid var(--border2);';
 
     let headerInner = '';
-    if (groupBy === 'order') {
+    if (Store.groupBy === 'order') {
       const firstName = g.items[0]?.name || '';
       const namePart  = g.items.length === 1
         ? `<span class="g-name">${esc(firstName)}</span>`
@@ -99,29 +95,26 @@ function renderGroupedRows(list) {
       headerInner = `${shopBadge(shopId)}${orderPart}${namePart}
         <span class="g-date">${fmtDate(parseDate(latestDate))}</span>
         ${g.items.length > 1 ? `<span class="g-count">${g.items.length} ${T.positions}</span>` : ''}`;
-
-    } else if (groupBy === 'shop') {
+    } else if (Store.groupBy === 'shop') {
       const firstName = g.items[0]?.name || '';
       const namePart  = g.items.length === 1
         ? `<span class="g-name">${esc(firstName)}</span>`
         : `<span class="g-name">${esc(firstName)} <span class="g-more">+${g.items.length - 1} ${T.more}</span></span>`;
       headerInner = `${shopBadge(shopId)}${namePart}
         <span class="g-count">${g.items.length} ${T.positions}</span>`;
-
-    } else if (groupBy === 'month') {
+    } else if (Store.groupBy === 'month') {
       const [y, m]   = g.key.split('-');
       const monthLbl = g.key === '—' ? '—' : new Date(+y, +m - 1, 1).toLocaleDateString(locale, { month: 'long', year: 'numeric' });
       headerInner = `<span class="g-month-label">${esc(monthLbl)}</span>
         <span class="g-count">${g.items.length} ${T.positions}</span>`;
-
-    } else if (groupBy === 'category') {
-      const catObj = cats.find(c => c.id === g.key);
+    } else if (Store.groupBy === 'category') {
+      const catObj = Store.cats.find(c => c.id === g.key);
       const catLbl = catObj ? catObj.name : (g.key === '—' ? '—' : g.key);
       headerInner = `<span class="g-cat-label">${esc(catLbl)}</span>
         <span class="g-count">${g.items.length} ${T.positions}</span>`;
     }
 
-    html += `<tr class="group-hdr" id="ghdr-${gid}" data-gid="${gid}" data-open="0" onclick="toggleGroup('${gid}')">
+    html += `<tr class="group-hdr" id="ghdr-${gid}" data-gid="${gid}" data-open="0" data-action="toggle-group" data-id="${gid}">
       <td colspan="7" style="${tdStyle}"><div class="group-hdr-inner">
         <span class="g-chevron" id="chev-${gid}">▶</span>
         ${headerInner}
@@ -133,16 +126,13 @@ function renderGroupedRows(list) {
   return html;
 }
 
-// ── ITEM ROW ──────────────────────────────────────────────────────────────────
-
 function renderItemTr(it, gid) {
   const ws     = warrantyStatus(it);
   const wEnd   = warrantyEnd(it);
-  const isOpen = openItemIds.has(it.id);
+  const isOpen = Store.openItemIds.has(it.id);
   const hidden = gid ? ' style="display:none"' : '';
   return `<tr class="item-tr${isOpen ? ' open' : ''}" id="itr-${it.id}"
-    data-group="${gid || ''}" data-id="${it.id}"${hidden}
-    onclick="toggleItem('${it.id}')">
+    data-group="${gid || ''}" data-id="${it.id}" data-action="toggle-item"${hidden}>
     <td class="td-name"><div class="td-name-inner"><span>${esc(it.name)}</span>
       ${it.serialNumber ? `<code style="font-size:.78rem">🔑 ${esc(it.serialNumber)}</code>` : ''}
       <div class="mobile-meta"><span class="mm-price">${fmtPrice(it.price)}</span><span class="mm-warranty">${wBadge(ws)}</span>${statusBadge(it.status)}</div>
@@ -151,26 +141,24 @@ function renderItemTr(it, gid) {
     <td class="td-shop col-shop">${gid ? '' : shopBadge(it.shop) + (it.order ? ` <span class="order-num">${esc(it.order)}</span>` : '')}</td>
     <td class="td-date col-date">${fmtDate(parseDate(it.date))}</td>
     <td class="td-price">${fmtPrice(it.price)}</td>
-    <td class="td-warranty">${wBadge(ws)}${wEnd ? `<br><span style="font-size:.73rem;color:var(--text3)">${fmtDate(wEnd)}</span>` : ''}</td>
+    <td class="td-warranty"><div class="warranty-cell">${wBadge(ws)}<span class="warranty-date">${wEnd ? fmtDate(wEnd) : ''}</span></div></td>
     <td class="td-status">${statusBadge(it.status)}</td>
   </tr>`;
 }
 
 function renderDetailTr(it) {
-  const isOpen = openItemIds.has(it.id);
+  const isOpen = Store.openItemIds.has(it.id);
   return `<tr class="detail-tr" id="dtr-${it.id}" style="${isOpen ? '' : 'display:none'}">
     <td colspan="7"><div class="item-detail">${isOpen ? renderDetail(it) : ''}</div></td>
   </tr>`;
 }
 
-// ── ITEM DETAIL ───────────────────────────────────────────────────────────────
-
 function renderDetail(it) {
-  const isSvc  = catIsService(it.category);
-  const specs  = Object.entries(it.specs || {});
-  const wEnd   = warrantyEnd(it);
-  const ws     = warrantyStatus(it);
-  const rcpts  = it.receipts || [];
+  const isSvc = catIsService(it.category);
+  const specs = Object.entries(it.specs || {});
+  const wEnd  = warrantyEnd(it);
+  const ws    = warrantyStatus(it);
+  const rcpts = it.receipts || [];
 
   let specsHtml = '<div class="detail-specs">';
   if (!isSvc && it.serialNumber)   specsHtml += specRow(T.specSerial,   `<code>${esc(it.serialNumber)}</code>`);
@@ -215,9 +203,9 @@ function renderDetail(it) {
   }
 
   rightHtml += `<div class="detail-actions">
-    <button class="btn btn-secondary btn-sm btn-block" onclick="openEdit('${it.id}');event.stopPropagation()">${T.editBtn}</button>
-    <button class="btn btn-ghost btn-sm btn-block"     onclick="openAddEvent('${it.id}');event.stopPropagation()">${T.eventBtn}</button>
-    <button class="btn btn-danger btn-sm btn-block"    onclick="deleteItem('${it.id}');event.stopPropagation()">${T.deleteBtn}</button>
+    <button class="btn btn-secondary btn-sm btn-block" data-action="edit-item" data-id="${it.id}">${T.editBtn}</button>
+    <button class="btn btn-ghost btn-sm btn-block"     data-action="add-event" data-id="${it.id}">${T.eventBtn}</button>
+    <button class="btn btn-danger btn-sm btn-block"    data-action="delete-item" data-id="${it.id}">${T.deleteBtn}</button>
   </div>`;
 
   return `<div class="item-detail-inner">
@@ -230,8 +218,6 @@ function specRow(k, v) {
   return `<div class="spec-entry"><div class="spec-k">${esc(k)}</div><div class="spec-v">${v}</div></div>`;
 }
 
-// ── TOGGLE GROUP ──────────────────────────────────────────────────────────────
-
 function toggleGroup(gid) {
   const hdr    = document.getElementById('ghdr-' + gid);
   const chev   = document.getElementById('chev-' + gid);
@@ -243,78 +229,26 @@ function toggleGroup(gid) {
     tr.style.display = isOpen ? 'none' : '';
     const dtr = document.getElementById('dtr-' + itemId);
     if (dtr) {
-      if (isOpen) { dtr.style.display = 'none'; openItemIds.delete(itemId); tr.classList.remove('open'); }
-      else        { dtr.style.display = openItemIds.has(itemId) ? '' : 'none'; }
+      if (isOpen) { dtr.style.display = 'none'; Store.openItemIds.delete(itemId); tr.classList.remove('open'); }
+      else        { dtr.style.display = Store.openItemIds.has(itemId) ? '' : 'none'; }
     }
   });
 }
-
-// ── TOGGLE ITEM ───────────────────────────────────────────────────────────────
 
 function toggleItem(id) {
   const itr = document.getElementById('itr-' + id);
   const dtr = document.getElementById('dtr-' + id);
   if (!dtr) return;
-  if (openItemIds.has(id)) {
-    openItemIds.delete(id);
+  if (Store.openItemIds.has(id)) {
+    Store.openItemIds.delete(id);
     itr?.classList.remove('open');
     dtr.style.display = 'none';
   } else {
-    openItemIds.add(id);
+    Store.openItemIds.add(id);
     itr?.classList.add('open');
-    const it = data.find(x => x.id === id);
+    const it = Store.data.find(x => x.id === id);
     if (it) dtr.querySelector('.item-detail').innerHTML = renderDetail(it);
     dtr.style.display = '';
     setTimeout(() => dtr.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
   }
-}
-
-// ── SETTINGS ──────────────────────────────────────────────────────────────────
-
-function renderSettings() {
-  document.getElementById('settingsView').innerHTML =
-    `<div class="settings-grid">${renderShopsCard()}${renderCatsCard()}</div>`;
-}
-
-function renderShopsCard() {
-  const rows = shops.map(s => {
-    const color = s.color || '#8da0bc';
-    const style = `background:${hexToRgba(color, .15)};color:${color};border:1px solid ${hexToRgba(color, .3)}`;
-    return `<div class="settings-list-item">
-      <div class="sli-info">
-        <div class="sli-name"><span class="shop-badge" style="${style}">${esc(s.name)}</span></div>
-        <div class="sli-sub">${s.url ? `<a href="${esc(s.url)}" target="_blank">${esc(s.url)}</a>` : ''}${s.note ? ' · ' + esc(s.note) : ''}</div>
-      </div>
-      <div class="sli-actions">
-        <button class="btn btn-ghost btn-sm btn-icon" onclick="openEditShop('${esc(s.id)}')" title="${T.editBtn}">✏️</button>
-        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteShop('${esc(s.id)}')" title="${T.deleteBtn}">🗑</button>
-      </div>
-    </div>`;
-  }).join('');
-
-  return `<div class="settings-card">
-    <div class="settings-card-hd"><h3>${T.shopsTitle}</h3><button class="btn btn-primary btn-sm" onclick="openAddShop()">${T.addBtn}</button></div>
-    <div class="settings-list">${rows || `<div style="padding:1rem 1.1rem">
-      <div style="color:var(--yellow);font-size:.88rem;font-weight:600;margin-bottom:.35rem">${T.shopsNotLoaded}</div>
-      <div style="color:var(--text3);font-size:.82rem;line-height:1.6">
-        ${T.hintChrome}<br>${T.hintFirefox}
-      </div></div>`}</div>
-  </div>`;
-}
-
-function renderCatsCard() {
-  const rows = cats.map(c => `<div class="settings-list-item">
-    <div class="sli-info">
-      <div class="sli-name">${esc(c.name)} ${c.isService ? '<span class="tag" style="font-size:.7rem">S</span>' : ''}</div>
-    </div>
-    <div class="sli-actions">
-      <button class="btn btn-ghost btn-sm btn-icon" onclick="openEditCat('${esc(c.id)}')" title="${T.editBtn}">✏️</button>
-      <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCat('${esc(c.id)}')" title="${T.deleteBtn}">🗑</button>
-    </div>
-  </div>`).join('');
-
-  return `<div class="settings-card">
-    <div class="settings-card-hd"><h3>${T.catsTitle}</h3><button class="btn btn-primary btn-sm" onclick="openAddCat()">${T.addBtn}</button></div>
-    <div class="settings-list">${rows || `<div style="padding:1rem;color:var(--text3);font-size:.88rem">${T.emptyList}</div>`}</div>
-  </div>`;
 }

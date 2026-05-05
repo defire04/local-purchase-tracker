@@ -23,18 +23,18 @@
             id="btnOpenDir"
             style="display: none; flex-direction: column; align-items: flex-start; gap: 0.1rem"
           >
-            <span data-i18n="connectOpen">📁 Open folder (Chrome / Brave)</span>
+            <span data-i18n="connectOpen">📁 Open data folder</span>
             <span
               style="font-size: 0.76rem; font-weight: 400; color: rgba(255, 255, 255, 0.65)"
               data-i18n="connectOpenSub"
-              >folder with: data.json, shops.json, categories.json</span
+              >data.json, shops.json, categories.json</span
             >
           </button>
           <label
             class="btn btn-secondary"
             style="cursor: pointer; flex-direction: column; align-items: flex-start; gap: 0.1rem"
           >
-            <span data-i18n="connectFiles">📄 Select files (Firefox)</span>
+            <span data-i18n="connectFiles">📄 Select data files</span>
             <span
               style="font-size: 0.76rem; font-weight: 400; color: var(--text3)"
               data-i18n="connectFilesSub"
@@ -82,7 +82,6 @@
 
       <!-- ── MAIN CONTENT ── -->
       <div class="main-content">
-        <!-- Controls -->
         <div class="controls" id="controls">
           <div class="controls-inner">
             <div class="search-wrap">
@@ -129,7 +128,6 @@
               <option value="returned" data-i18n-opt="sReturned">Returned</option>
               <option value="written_off" data-i18n-opt="sWrittenOff">Written off</option>
             </select>
-            <!-- Mobile filter button -->
             <button class="btn-filter-mobile" id="btnFilterMobile" onclick="openFilterSheet()">
               <span>⚙</span
               ><span class="filter-count" id="filterCount" style="display: none"></span>
@@ -153,11 +151,10 @@
           </div>
         </div>
 
-        <!-- Views -->
         <div id="listView"></div>
-        <div class="view" id="settingsView"></div> </div
-      ><!-- /main-content --> </div
-    ><!-- /mainApp -->
+        <div class="view" id="settingsView"></div>
+      </div>
+    </div>
 
     <!-- ════════════ FILTER BOTTOM SHEET (mobile) ════════════ -->
     <div class="sheet-backdrop" id="filterSheet" style="display: none" onclick="closeFilterSheet()">
@@ -223,12 +220,7 @@
     </div>
 
     <!-- ════════════ MODAL: ITEM ════════════ -->
-    <div
-      class="modal-backdrop"
-      id="modalItem"
-      style="display: none"
-      onclick="mbClose(event, 'modalItem')"
-    >
+    <div class="modal-backdrop" id="modalItem" style="display: none" onclick="mbClose(event, 'modalItem')">
       <div class="modal">
         <div class="modal-hd">
           <h2 id="modalItemTitle">Add item</h2>
@@ -239,12 +231,7 @@
           <div class="form-row form-row-2">
             <div class="form-group" style="grid-column: 1/-1">
               <label data-i18n="lName">Name *</label>
-              <input
-                type="text"
-                id="fName"
-                data-i18n-ph="phName"
-                placeholder="Product or service name"
-              />
+              <input type="text" id="fName" data-i18n-ph="phName" placeholder="Product or service name" />
             </div>
             <div class="form-group">
               <label data-i18n="lCat">Category</label>
@@ -288,12 +275,7 @@
           <div id="fg-executor" style="display: none">
             <div class="form-group">
               <label data-i18n="lExecutor">Executor</label>
-              <input
-                type="text"
-                id="fExecutor"
-                data-i18n-ph="phExecutor"
-                placeholder="Company or contractor name"
-              />
+              <input type="text" id="fExecutor" data-i18n-ph="phExecutor" placeholder="Company or contractor name" />
             </div>
           </div>
 
@@ -304,12 +286,7 @@
 
           <div id="fg-ek" class="form-group">
             <label data-i18n="lEkLink">ek.ua link</label>
-            <input
-              type="url"
-              id="fEkLink"
-              data-i18n-ph="phEkLink"
-              placeholder="https://ek.ua/ua/…"
-            />
+            <input type="url" id="fEkLink" data-i18n-ph="phEkLink" placeholder="https://ek.ua/ua/…" />
           </div>
 
           <div class="form-group">
@@ -365,21 +342,14 @@
           </div>
         </div>
         <div class="modal-ft">
-          <button class="btn btn-ghost" onclick="closeModal('modalItem')" data-i18n="cancelBtn"
-            >Cancel</button
-          >
+          <button class="btn btn-ghost" onclick="closeModal('modalItem')" data-i18n="cancelBtn">Cancel</button>
           <button class="btn btn-primary" onclick="saveItem()" data-i18n="saveBtn">Save</button>
         </div>
       </div>
     </div>
 
     <!-- ════════════ MODAL: SHOP ════════════ -->
-    <div
-      class="modal-backdrop"
-      id="modalShop"
-      style="display: none"
-      onclick="mbClose(event, 'modalShop')"
-    >
+    <div class="modal-backdrop" id="modalShop" style="display: none" onclick="mbClose(event, 'modalShop')">
       <div class="modal" style="max-width: 460px">
         <div class="modal-hd">
           <h2 id="modalShopTitle">Shop</h2>
@@ -389,12 +359,10 @@
           <input type="hidden" id="sId" />
           <div class="form-group"
             ><label data-i18n="lShopName">Name *</label
-            ><input type="text" id="sName" data-i18n-ph="phShopName" placeholder="telemart.ua"
-          /></div>
+            ><input type="text" id="sName" data-i18n-ph="phShopName" /></div>
           <div class="form-group"
             ><label data-i18n="lShopUrl">URL</label
-            ><input type="url" id="sUrl" placeholder="https://…"
-          /></div>
+            ><input type="url" id="sUrl" placeholder="https://…" /></div>
           <div class="form-group">
             <label data-i18n="lShopColor">Badge color</label>
             <div class="color-field">
@@ -403,29 +371,20 @@
             </div>
           </div>
           <div class="form-group"
-            ><label data-i18n="lShopLogin">Login / Email</label><input type="text" id="sLogin"
-          /></div>
+            ><label data-i18n="lShopLogin">Login / Email</label><input type="text" id="sLogin" /></div>
           <div class="form-group"
             ><label data-i18n="lShopNote">Note</label
-            ><textarea id="sNote" style="min-height: 56px"></textarea>
-          </div>
+            ><textarea id="sNote" style="min-height: 56px"></textarea></div>
         </div>
         <div class="modal-ft">
-          <button class="btn btn-ghost" onclick="closeModal('modalShop')" data-i18n="cancelBtn"
-            >Cancel</button
-          >
+          <button class="btn btn-ghost" onclick="closeModal('modalShop')" data-i18n="cancelBtn">Cancel</button>
           <button class="btn btn-primary" onclick="saveShop()" data-i18n="saveBtn">Save</button>
         </div>
       </div>
     </div>
 
     <!-- ════════════ MODAL: CATEGORY ════════════ -->
-    <div
-      class="modal-backdrop"
-      id="modalCat"
-      style="display: none"
-      onclick="mbClose(event, 'modalCat')"
-    >
+    <div class="modal-backdrop" id="modalCat" style="display: none" onclick="mbClose(event, 'modalCat')">
       <div class="modal" style="max-width: 400px">
         <div class="modal-hd">
           <h2 id="modalCatTitle" data-i18n="modalAddCat">Add category</h2>
@@ -434,49 +393,25 @@
         <div class="modal-body">
           <div class="form-group"
             ><label data-i18n="lCatName">Name *</label
-            ><input type="text" id="cName" data-i18n-ph="phCatName" placeholder="Sports goods"
-          /></div>
-          <div
-            class="form-group"
-            style="flex-direction: row; align-items: center; gap: 0.75rem; margin-top: 0.25rem"
-          >
-            <input
-              type="checkbox"
-              id="cIsService"
-              style="width: 18px; height: 18px; cursor: pointer"
-            />
+            ><input type="text" id="cName" data-i18n-ph="phCatName" /></div>
+          <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.75rem; margin-top: 0.25rem">
+            <input type="checkbox" id="cIsService" style="width: 18px; height: 18px; cursor: pointer" />
             <label
               for="cIsService"
-              style="
-                font-size: 0.9rem;
-                font-weight: 500;
-                color: var(--text2);
-                text-transform: none;
-                letter-spacing: 0;
-                cursor: pointer;
-              "
+              style="font-size: 0.9rem; font-weight: 500; color: var(--text2); text-transform: none; letter-spacing: 0; cursor: pointer"
               data-i18n="isServiceLbl"
-            >
-              This is a service (hide warranty and S/N)
-            </label>
+            >This is a service (hide warranty and S/N)</label>
           </div>
         </div>
         <div class="modal-ft">
-          <button class="btn btn-ghost" onclick="closeModal('modalCat')" data-i18n="cancelBtn"
-            >Cancel</button
-          >
+          <button class="btn btn-ghost" onclick="closeModal('modalCat')" data-i18n="cancelBtn">Cancel</button>
           <button class="btn btn-primary" id="btnSaveCat" onclick="saveCat()" data-i18n="addCatBtn">Add</button>
         </div>
       </div>
     </div>
 
     <!-- ════════════ MODAL: EVENT ════════════ -->
-    <div
-      class="modal-backdrop"
-      id="modalEvent"
-      style="display: none"
-      onclick="mbClose(event, 'modalEvent')"
-    >
+    <div class="modal-backdrop" id="modalEvent" style="display: none" onclick="mbClose(event, 'modalEvent')">
       <div class="modal" style="max-width: 440px">
         <div class="modal-hd">
           <h2 data-i18n="modalAddEvent">Add event</h2>
@@ -485,8 +420,7 @@
         <div class="modal-body">
           <input type="hidden" id="evItemId" />
           <div class="form-group"
-            ><label data-i18n="lEvDate">Date</label><input type="date" id="evDate"
-          /></div>
+            ><label data-i18n="lEvDate">Date</label><input type="date" id="evDate" /></div>
           <div class="form-group">
             <label data-i18n="lEvType">Type</label>
             <select id="evType">
@@ -498,25 +432,17 @@
           </div>
           <div class="form-group"
             ><label data-i18n="lEvDesc">Description</label
-            ><textarea id="evNote" data-i18n-ph="phEvDesc" placeholder="What happened…"></textarea>
-          </div>
+            ><textarea id="evNote" data-i18n-ph="phEvDesc" placeholder="What happened…"></textarea></div>
         </div>
         <div class="modal-ft">
-          <button class="btn btn-ghost" onclick="closeModal('modalEvent')" data-i18n="cancelBtn"
-            >Cancel</button
-          >
+          <button class="btn btn-ghost" onclick="closeModal('modalEvent')" data-i18n="cancelBtn">Cancel</button>
           <button class="btn btn-primary" onclick="saveEvent()" data-i18n="saveBtn">Save</button>
         </div>
       </div>
     </div>
 
     <!-- ════════════ MODAL: EXPORT ════════════ -->
-    <div
-      class="modal-backdrop"
-      id="modalExport"
-      style="display: none"
-      onclick="mbClose(event, 'modalExport')"
-    >
+    <div class="modal-backdrop" id="modalExport" style="display: none" onclick="mbClose(event, 'modalExport')">
       <div class="modal" style="max-width: 440px">
         <div class="modal-hd">
           <h2 data-i18n="modalExportTitle">📊 Export to Excel</h2>
@@ -541,28 +467,19 @@
               <option value="filtered" data-i18n-opt="expFiltered">Current filters</option>
             </select>
           </div>
-          <div
-            style="font-size: 0.82rem; color: var(--text3); line-height: 1.6; padding: 0.1rem 0"
-            data-i18n="expDesc"
-          >
-            Exports: name, brand, category, shop, date, price, warranty, serial number, status,
-            receipts, links.
+          <div style="font-size: 0.82rem; color: var(--text3); line-height: 1.6; padding: 0.1rem 0" data-i18n="expDesc">
+            Exports: name, brand, category, shop, date, price, warranty, serial number, status, receipts, links.
           </div>
         </div>
         <div class="modal-ft">
-          <button class="btn btn-ghost" onclick="closeModal('modalExport')" data-i18n="cancelBtn"
-            >Cancel</button
-          >
-          <button class="btn btn-primary" onclick="doExport()" data-i18n="expExportBtn"
-            >📥 Export</button
-          >
+          <button class="btn btn-ghost" onclick="closeModal('modalExport')" data-i18n="cancelBtn">Cancel</button>
+          <button class="btn btn-primary" onclick="doExport()" data-i18n="expExportBtn">📥 Export</button>
         </div>
       </div>
     </div>
 
     <div id="toast"></div>
 
-    <!-- Fixed language switcher -->
     <div id="langBar">
       <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
       <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">УК</button>
@@ -573,10 +490,16 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <script src="src/i18n.js"></script>
     <script src="src/utils.js"></script>
+    <script src="src/store.js"></script>
     <script src="src/state.js"></script>
     <script src="src/storage.js"></script>
-    <script src="src/render.js"></script>
-    <script src="src/modals.js"></script>
+    <script src="src/services/item-service.js"></script>
+    <script src="src/services/shop-service.js"></script>
+    <script src="src/services/cat-service.js"></script>
+    <script src="src/ui/list-view.js"></script>
+    <script src="src/ui/settings-view.js"></script>
+    <script src="src/ui/modals.js"></script>
+    <script src="src/ui/filter-sheet.js"></script>
     <script src="src/export.js"></script>
     <script src="src/app.js"></script>
   </body>

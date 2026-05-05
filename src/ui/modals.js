@@ -1,7 +1,5 @@
 'use strict';
 
-// ── MODAL HELPERS ─────────────────────────────────────────────────────────────
-
 function openModal(id) {
   document.getElementById(id).style.display = 'flex';
   document.body.classList.add('modal-open');
@@ -15,8 +13,6 @@ function closeModal(id) {
 function mbClose(e, id) {
   if (e.target === document.getElementById(id)) closeModal(id);
 }
-
-// ── ITEM CRUD ─────────────────────────────────────────────────────────────────
 
 function openAdd() {
   const f = id => document.getElementById(id);
@@ -44,7 +40,7 @@ function openAdd() {
 }
 
 function openEdit(id) {
-  const it = data.find(x => x.id === id);
+  const it = Store.data.find(x => x.id === id);
   if (!it) return;
   const f = id => document.getElementById(id);
   document.getElementById('modalItemTitle').textContent = T.modalEditTitle;
@@ -76,7 +72,7 @@ function openEdit(id) {
 function fillCatSelect(selId, val) {
   const sel = document.getElementById(selId);
   sel.innerHTML = '';
-  cats.forEach(c => {
+  Store.cats.forEach(c => {
     const o = document.createElement('option');
     o.value = c.id; o.textContent = c.name;
     sel.appendChild(o);
@@ -87,7 +83,7 @@ function fillCatSelect(selId, val) {
 function fillShopSelect(selId, val) {
   const sel = document.getElementById(selId);
   sel.innerHTML = `<option value="">${T.noShop}</option>`;
-  shops.forEach(s => {
+  Store.shops.forEach(s => {
     const o = document.createElement('option');
     o.value = s.id; o.textContent = s.name;
     sel.appendChild(o);
@@ -118,7 +114,7 @@ function addSpecRow(key = '', val = '') {
   d.className = 'spec-row-edit';
   d.innerHTML = `<input type="text" placeholder="${T.phSpecKey}" value="${esc(key)}">
     <input type="text" placeholder="${T.phSpecVal}" value="${esc(val)}">
-    <button class="spec-del" onclick="this.parentElement.remove()" title="${T.deleteBtn}">×</button>`;
+    <button class="spec-del" data-action="remove-row" title="${T.deleteBtn}">×</button>`;
   ed.appendChild(d);
 }
 
@@ -135,7 +131,7 @@ function addEvRow(ev) {
       <option value="note"           ${ev.type === 'note'           ? 'selected' : ''}>${T.evNoteOpt}</option>
     </select>
     <input type="text" class="ev-n ev-note-f" placeholder="${T.phEvDesc}" value="${esc(ev.note || '')}">
-    <button class="spec-del" onclick="this.parentElement.remove()" title="${T.deleteBtn}">×</button>`;
+    <button class="spec-del" data-action="remove-row" title="${T.deleteBtn}">×</button>`;
   ed.appendChild(d);
 }
 
@@ -147,12 +143,12 @@ function addReceiptRow(r) {
   const typeOpts = [
     { value: 'url',   label: T.rcptUrl   },
     { value: 'pdf',   label: T.rcptPdf   },
-    { value: 'photo', label: T.rcptPhoto }
+    { value: 'photo', label: T.rcptPhoto },
   ].map(t => `<option value="${t.value}" ${r.type === t.value ? 'selected' : ''}>${t.label}</option>`).join('');
   d.innerHTML = `<select class="rcpt-type">${typeOpts}</select>
     <input type="text" class="rcpt-label" placeholder="${T.phRcptLbl}" value="${esc(r.label || '')}">
     <input type="text" class="rcpt-value" placeholder="${T.phRcptVal}" value="${esc(r.value || '')}">
-    <button class="spec-del" onclick="this.parentElement.remove()" title="${T.deleteBtn}">×</button>`;
+    <button class="spec-del" data-action="remove-row" title="${T.deleteBtn}">×</button>`;
   ed.appendChild(d);
 }
 
@@ -176,7 +172,7 @@ function saveItem() {
     events.push({
       date: fromInputDate(r.querySelector('.ev-d').value),
       type: r.querySelector('.ev-t').value,
-      note: r.querySelector('.ev-n').value.trim()
+      note: r.querySelector('.ev-n').value.trim(),
     });
   });
 
@@ -187,12 +183,12 @@ function saveItem() {
       receipts.push({
         type:  r.querySelector('.rcpt-type').value,
         label: r.querySelector('.rcpt-label').value.trim(),
-        value: val
+        value: val,
       });
     }
   });
 
-  const item = {
+  ItemService.save({
     id:             fId || uid(),
     name,
     brand:          isSvc ? '' : document.getElementById('fBrand').value.trim(),
@@ -211,17 +207,10 @@ function saveItem() {
     note:           document.getElementById('fNote').value.trim(),
     status:         document.getElementById('fStatus').value,
     events,
-  };
-
-  if (fId) {
-    const idx = data.findIndex(x => x.id === fId);
-    if (idx >= 0) data[idx] = item; else data.unshift(item);
-  } else {
-    data.unshift(item);
-  }
+  });
 
   closeModal('modalItem');
-  openItemIds.clear();
+  Store.openItemIds.clear();
   markDirty('data');
   buildFilters();
   render();
@@ -229,52 +218,45 @@ function saveItem() {
 }
 
 function deleteItem(id) {
-  const it = data.find(x => x.id === id);
+  const it = Store.data.find(x => x.id === id);
   if (!confirm(T.confirmDelete(it?.name))) return;
-  data = data.filter(x => x.id !== id);
-  openItemIds.delete(id);
+  ItemService.remove(id);
   markDirty('data');
   buildFilters();
   render();
   toast(T.toastDeleted);
 }
 
-// ── QUICK EVENT ───────────────────────────────────────────────────────────────
-
 function openAddEvent(itemId) {
-  document.getElementById('evItemId').value  = itemId;
-  document.getElementById('evDate').value    = new Date().toISOString().slice(0, 10);
-  document.getElementById('evType').value    = 'warranty_claim';
-  document.getElementById('evNote').value    = '';
+  document.getElementById('evItemId').value = itemId;
+  document.getElementById('evDate').value   = new Date().toISOString().slice(0, 10);
+  document.getElementById('evType').value   = 'warranty_claim';
+  document.getElementById('evNote').value   = '';
   openModal('modalEvent');
 }
 
 function saveEvent() {
   const id = document.getElementById('evItemId').value;
-  const it = data.find(x => x.id === id);
-  if (!it) return;
-  if (!it.events) it.events = [];
-  it.events.push({
+  const it = ItemService.addEvent(id, {
     date: fromInputDate(document.getElementById('evDate').value),
     type: document.getElementById('evType').value,
-    note: document.getElementById('evNote').value.trim()
+    note: document.getElementById('evNote').value.trim(),
   });
+  if (!it) return;
   closeModal('modalEvent');
   markDirty('data');
-  if (openItemIds.has(id)) {
+  if (Store.openItemIds.has(id)) {
     const dtr = document.getElementById('dtr-' + id);
     if (dtr) dtr.querySelector('.item-detail').innerHTML = renderDetail(it);
   }
   toast(T.toastEventAdded, 'ok');
 }
 
-// ── SHOP CRUD ─────────────────────────────────────────────────────────────────
-
 function buildColorPresets(currentColor) {
   const el = document.getElementById('colorPresets');
   el.innerHTML = COLOR_PALETTE.map(c =>
     `<div class="color-preset${c === currentColor ? ' active' : ''}"
-      style="background:${c}" onclick="pickColor('${c}')" title="${c}"></div>`
+      style="background:${c}" data-action="pick-color" data-color="${c}" title="${c}"></div>`
   ).join('');
 }
 
@@ -309,21 +291,15 @@ function openEditShop(id) {
 function saveShop() {
   const name = document.getElementById('sName').value.trim();
   if (!name) { toast(T.toastEnterName, 'err'); return; }
-  const fId  = document.getElementById('sId').value;
-  const shop = {
+  const fId = document.getElementById('sId').value;
+  ShopService.save({
     id:    fId || uid(),
     name,
     url:   document.getElementById('sUrl').value.trim(),
     login: document.getElementById('sLogin').value.trim(),
     note:  document.getElementById('sNote').value.trim(),
     color: document.getElementById('sColor').value,
-  };
-  if (fId) {
-    const idx = shops.findIndex(s => s.id === fId);
-    if (idx >= 0) shops[idx] = shop; else shops.push(shop);
-  } else {
-    shops.push(shop);
-  }
+  });
   closeModal('modalShop');
   markDirty('shops');
   buildFilters();
@@ -334,14 +310,12 @@ function saveShop() {
 function deleteShop(id) {
   const s = shopById(id);
   if (!confirm(T.confirmDelShop(s?.name))) return;
-  shops = shops.filter(x => x.id !== id);
+  ShopService.remove(id);
   markDirty('shops');
   buildFilters();
   renderSettings();
   toast(T.toastDeleted);
 }
-
-// ── CATEGORY CRUD ─────────────────────────────────────────────────────────────
 
 let _editCatId = null;
 
@@ -355,7 +329,7 @@ function openAddCat() {
 }
 
 function openEditCat(id) {
-  const c = cats.find(x => x.id === id);
+  const c = Store.cats.find(x => x.id === id);
   if (!c) return;
   _editCatId = id;
   document.getElementById('cName').value = c.name;
@@ -368,13 +342,7 @@ function openEditCat(id) {
 function saveCat() {
   const name = document.getElementById('cName').value.trim();
   if (!name) { toast(T.toastEnterName, 'err'); return; }
-  const isService = document.getElementById('cIsService').checked;
-  if (_editCatId) {
-    const c = cats.find(x => x.id === _editCatId);
-    if (c) { c.name = name; c.isService = isService; }
-  } else {
-    cats.push({ id: uid(), name, isService });
-  }
+  CatService.save({ id: _editCatId || uid(), name, isService: document.getElementById('cIsService').checked });
   closeModal('modalCat');
   markDirty('cats');
   buildFilters();
@@ -384,11 +352,11 @@ function saveCat() {
 }
 
 function deleteCat(id) {
-  const c     = cats.find(x => x.id === id);
-  const inUse = data.some(i => i.category === id);
-  if (inUse && !confirm(T.confirmDelCatUsed(c?.name))) return;
-  if (!inUse && !confirm(T.confirmDelCat(c?.name))) return;
-  cats = cats.filter(x => x.id !== id);
+  const c     = Store.cats.find(x => x.id === id);
+  const inUse = Store.data.some(i => i.category === id);
+  if (inUse  && !confirm(T.confirmDelCatUsed(c?.name))) return;
+  if (!inUse && !confirm(T.confirmDelCat(c?.name)))     return;
+  CatService.remove(id);
   markDirty('cats');
   buildFilters();
   renderSettings();

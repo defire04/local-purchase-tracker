@@ -34,9 +34,9 @@ function doExport() {
   if (scope === 'filtered') {
     items = getFiltered().filter(inRange);
   } else if (scope === 'active') {
-    items = data.filter(it => it.status === 'active' && inRange(it));
+    items = Store.data.filter(it => it.status === 'active' && inRange(it));
   } else {
-    items = data.filter(inRange);
+    items = Store.data.filter(inRange);
   }
 
   items.sort((a, b) => (parseDate(b.date) || 0) - (parseDate(a.date) || 0));
@@ -134,7 +134,7 @@ function generateExcel(items, from, to) {
       })
       .join('\n');
 
-    const catObj  = cats.find(c => c.id === it.category);
+    const catObj  = Store.cats.find(c => c.id === it.category);
     const shopObj = shopById(it.shop);
 
     const s  = (v, st = base) => ({ v: v || '', t: 's', s: st });

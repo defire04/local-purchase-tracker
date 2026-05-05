@@ -4,7 +4,7 @@ const HAS_FSA = typeof window.showDirectoryPicker === 'function';
 
 async function connectDirectory() {
   try {
-    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    Store.setDirHandle(await window.showDirectoryPicker({ mode: 'readwrite' }));
     await readAllFiles();
   } catch (e) {
     if (e.name !== 'AbortError') toast(T.toastOpenErr, 'err');
@@ -12,7 +12,7 @@ async function connectDirectory() {
 }
 
 async function getOrCreateFH(name) {
-  return dirHandle.getFileHandle(name, { create: true });
+  return Store.dirHandle.getFileHandle(name, { create: true });
 }
 
 async function readJSON(fh) {
@@ -31,17 +31,17 @@ async function writeJSON(fh, obj) {
 
 async function readAllFiles() {
   try {
-    dataFH  = await getOrCreateFH('data.json');
-    shopsFH = await getOrCreateFH('shops.json');
-    catsFH  = await getOrCreateFH('categories.json');
-    const d = await readJSON(dataFH);
-    const s = await readJSON(shopsFH);
-    const c = await readJSON(catsFH);
-    data  = (Array.isArray(d) && d.length ? d : []).map(migrateItem);
-    shops = Array.isArray(s) && s.length ? s : defaultShops();
-    cats  = Array.isArray(c) && c.length ? c : defaultCats();
+    Store.setDataFH(await getOrCreateFH('data.json'));
+    Store.setShopsFH(await getOrCreateFH('shops.json'));
+    Store.setCatsFH(await getOrCreateFH('categories.json'));
+    const d = await readJSON(Store.dataFH);
+    const s = await readJSON(Store.shopsFH);
+    const c = await readJSON(Store.catsFH);
+    Store.setData((Array.isArray(d) && d.length ? d : []).map(migrateItem));
+    Store.setShops(Array.isArray(s) && s.length ? s : []);
+    Store.setCats(Array.isArray(c) && c.length ? c : []);
     showApp();
-    toast(T.toastLoaded(data.length, shops.length), shops.length ? 'ok' : '');
+    toast(T.toastLoaded(Store.data.length, Store.shops.length), Store.shops.length ? 'ok' : '');
   } catch (e) {
     console.error(e);
     toast(T.toastReadErr, 'err');
@@ -49,24 +49,21 @@ async function readAllFiles() {
 }
 
 async function ensureWritePermission() {
-  if (!dirHandle) return false;
+  if (!Store.dirHandle) return false;
   const opts = { mode: 'readwrite' };
-  if ((await dirHandle.queryPermission(opts)) === 'granted') return true;
-  try { return (await dirHandle.requestPermission(opts)) === 'granted'; }
+  if ((await Store.dirHandle.queryPermission(opts)) === 'granted') return true;
+  try { return (await Store.dirHandle.requestPermission(opts)) === 'granted'; }
   catch { return false; }
 }
 
 async function saveAll() {
-  if (dirHandle) {
+  if (Store.dirHandle) {
     const ok = await ensureWritePermission();
-    if (!ok) {
-      toast(T.toastWriteDenied, 'err');
-      return;
-    }
+    if (!ok) { toast(T.toastWriteDenied, 'err'); return; }
     try {
-      if (dirty.data  || !dataFH)  { if (!dataFH)  dataFH  = await getOrCreateFH('data.json');       await writeJSON(dataFH,  data);  }
-      if (dirty.shops || !shopsFH) { if (!shopsFH) shopsFH = await getOrCreateFH('shops.json');      await writeJSON(shopsFH, shops); }
-      if (dirty.cats  || !catsFH)  { if (!catsFH)  catsFH  = await getOrCreateFH('categories.json'); await writeJSON(catsFH,  cats);  }
+      if (Store.dirty.data  || !Store.dataFH)  { if (!Store.dataFH)  Store.setDataFH(await getOrCreateFH('data.json'));         await writeJSON(Store.dataFH,  Store.data);  }
+      if (Store.dirty.shops || !Store.shopsFH) { if (!Store.shopsFH) Store.setShopsFH(await getOrCreateFH('shops.json'));       await writeJSON(Store.shopsFH, Store.shops); }
+      if (Store.dirty.cats  || !Store.catsFH)  { if (!Store.catsFH)  Store.setCatsFH(await getOrCreateFH('categories.json'));   await writeJSON(Store.catsFH,  Store.cats);  }
       clearDirty();
       toast(T.toastSaved, 'ok');
       return;
@@ -76,9 +73,9 @@ async function saveAll() {
       return;
     }
   }
-  downloadJSON('data.json',       data);
-  downloadJSON('shops.json',      shops);
-  downloadJSON('categories.json', cats);
+  downloadJSON('data.json',       Store.data);
+  downloadJSON('shops.json',      Store.shops);
+  downloadJSON('categories.json', Store.cats);
   clearDirty();
   toast(T.toastDownloaded, 'ok');
 }
@@ -105,12 +102,12 @@ async function loadMultipleFiles(files) {
   if (!df) { toast(T.toastReadErr, 'err'); return; }
   try {
     const rawD = await readFileAsJSON(df);
-    data  = (Array.isArray(rawD) ? rawD : []).map(migrateItem);
-    shops = sf ? await readFileAsJSON(sf).catch(() => defaultShops()) : defaultShops();
-    cats  = cf ? await readFileAsJSON(cf).catch(() => defaultCats())  : defaultCats();
-    if (!Array.isArray(shops) || !shops.length) shops = defaultShops();
-    if (!Array.isArray(cats)  || !cats.length)  cats  = defaultCats();
+    Store.setData((Array.isArray(rawD) ? rawD : []).map(migrateItem));
+    const rawS = sf ? await readFileAsJSON(sf).catch(() => []) : [];
+    Store.setShops(Array.isArray(rawS) && rawS.length ? rawS : []);
+    const rawC = cf ? await readFileAsJSON(cf).catch(() => []) : [];
+    Store.setCats(Array.isArray(rawC) && rawC.length ? rawC : []);
     showApp();
-    toast(T.toastLoaded(data.length, shops.length), 'ok');
+    toast(T.toastLoaded(Store.data.length, Store.shops.length), 'ok');
   } catch { toast(T.toastReadErr, 'err'); }
 }

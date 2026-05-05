@@ -1,7 +1,5 @@
 'use strict';
 
-// ── TOAST ─────────────────────────────────────────────────────────────────────
-
 let _toastTm;
 function toast(msg, type = '') {
   const el = document.getElementById('toast');
@@ -11,24 +9,20 @@ function toast(msg, type = '') {
   _toastTm = setTimeout(() => (el.className = ''), 3200);
 }
 
-// ── DIRTY & AUTO-SAVE ────────────────────────────────────────────────────────
-
 let _autoSaveTm;
 function markDirty(key) {
-  dirty[key] = true;
+  Store.markDirty(key);
   document.getElementById('dirtyBadge').style.display = 'flex';
-  if (dirHandle) {
+  if (Store.dirHandle) {
     clearTimeout(_autoSaveTm);
     _autoSaveTm = setTimeout(() => saveAll(), 600);
   }
 }
 
 function clearDirty() {
-  dirty = { data: false, shops: false, cats: false };
+  Store.clearDirty();
   document.getElementById('dirtyBadge').style.display = 'none';
 }
-
-// ── APP BOOT ──────────────────────────────────────────────────────────────────
 
 function showApp() {
   document.getElementById('connectScreen').style.display = 'none';
@@ -38,7 +32,7 @@ function showApp() {
 }
 
 function switchView(v) {
-  currentView = v;
+  Store.setView(v);
   document.getElementById('tabList').classList.toggle('active', v === 'list');
   document.getElementById('tabSettings').classList.toggle('active', v === 'settings');
   document.getElementById('controls').style.display = v === 'list' ? 'flex' : 'none';
@@ -47,16 +41,13 @@ function switchView(v) {
   if (v === 'settings') renderSettings();
 }
 
-// ── FILTERS ───────────────────────────────────────────────────────────────────
-
 function buildFilters() {
   const catSel = document.getElementById('filterCat');
-  const cprev = catSel.value;
+  const cprev  = catSel.value;
   catSel.innerHTML = `<option value="">${T.allCats}</option>`;
-  cats.forEach((c) => {
+  Store.cats.forEach(c => {
     const o = document.createElement('option');
-    o.value = c.id;
-    o.textContent = c.name;
+    o.value = c.id; o.textContent = c.name;
     catSel.appendChild(o);
   });
   catSel.value = cprev;
@@ -64,23 +55,21 @@ function buildFilters() {
   const catSelM = document.getElementById('filterCatM');
   if (catSelM) {
     catSelM.innerHTML = `<option value="">${T.allCats}</option>`;
-    cats.forEach((c) => {
+    Store.cats.forEach(c => {
       const o = document.createElement('option');
-      o.value = c.id;
-      o.textContent = c.name;
+      o.value = c.id; o.textContent = c.name;
       catSelM.appendChild(o);
     });
     catSelM.value = cprev;
   }
 
-  const brands = [...new Set(data.map((i) => i.brand).filter(Boolean))].sort();
+  const brands   = [...new Set(Store.data.map(i => i.brand).filter(Boolean))].sort();
   const brandSel = document.getElementById('filterBrand');
-  const bprev = brandSel.value;
+  const bprev    = brandSel.value;
   brandSel.innerHTML = `<option value="">${T.allBrands}</option>`;
-  brands.forEach((b) => {
+  brands.forEach(b => {
     const o = document.createElement('option');
-    o.value = b;
-    o.textContent = b;
+    o.value = b; o.textContent = b;
     brandSel.appendChild(o);
   });
   brandSel.value = bprev;
@@ -88,23 +77,21 @@ function buildFilters() {
   const brandSelM = document.getElementById('filterBrandM');
   if (brandSelM) {
     brandSelM.innerHTML = `<option value="">${T.allBrands}</option>`;
-    brands.forEach((b) => {
+    brands.forEach(b => {
       const o = document.createElement('option');
-      o.value = b;
-      o.textContent = b;
+      o.value = b; o.textContent = b;
       brandSelM.appendChild(o);
     });
     brandSelM.value = bprev;
   }
 
-  const shopIds = [...new Set(data.map((i) => i.shop).filter(Boolean))].sort();
+  const shopIds = [...new Set(Store.data.map(i => i.shop).filter(Boolean))].sort();
   const shopSel = document.getElementById('filterShop');
-  const sprev = shopSel.value;
+  const sprev   = shopSel.value;
   shopSel.innerHTML = `<option value="">${T.allShops}</option>`;
-  shopIds.forEach((id) => {
+  shopIds.forEach(id => {
     const o = document.createElement('option');
-    o.value = id;
-    o.textContent = shopName(id);
+    o.value = id; o.textContent = shopName(id);
     shopSel.appendChild(o);
   });
   shopSel.value = sprev;
@@ -112,17 +99,15 @@ function buildFilters() {
   const shopSelM = document.getElementById('filterShopM');
   if (shopSelM) {
     shopSelM.innerHTML = `<option value="">${T.allShops}</option>`;
-    shopIds.forEach((id) => {
+    shopIds.forEach(id => {
       const o = document.createElement('option');
-      o.value = id;
-      o.textContent = shopName(id);
+      o.value = id; o.textContent = shopName(id);
       shopSelM.appendChild(o);
     });
     shopSelM.value = sprev;
   }
 
-  // Warranty filter options
-  const wSel = document.getElementById('filterWarranty');
+  const wSel  = document.getElementById('filterWarranty');
   const wprev = wSel.value;
   wSel.innerHTML = `
     <option value="">${T.allWarranty}</option>
@@ -143,8 +128,7 @@ function buildFilters() {
     wSelM.value = wprev;
   }
 
-  // Status filter options
-  const sSel = document.getElementById('filterStatus');
+  const sSel   = document.getElementById('filterStatus');
   const sprevS = sSel.value;
   sSel.innerHTML = `
     <option value="">${T.allStatuses}</option>
@@ -163,9 +147,8 @@ function buildFilters() {
     sSelM.value = sprevS;
   }
 
-  // GroupBy options
-  const gSel = document.getElementById('groupBy');
-  const gprev = gSel.value;
+  const gSel    = document.getElementById('groupBy');
+  const gprev   = gSel.value;
   const groupOpts = `
     <option value="">${T.groupList}</option>
     <option value="order">${T.groupOrder}</option>
@@ -180,98 +163,71 @@ function buildFilters() {
 }
 
 function hasTextFilters() {
-  return [
-    'search',
-    'filterCat',
-    'filterBrand',
-    'filterShop',
-    'filterWarranty',
-    'filterStatus',
-  ].some((id) => document.getElementById(id).value.trim());
+  return ['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus']
+    .some(id => document.getElementById(id).value.trim());
 }
 
 function isGroupedMode() {
-  return groupBy !== '' && sortCol === null;
+  return Store.groupBy !== '' && Store.sortCol === null;
 }
 
 function updateResetBtn() {
-  document
-    .getElementById('btnReset')
-    .classList.toggle('visible', sortCol !== null || hasTextFilters());
+  document.getElementById('btnReset')
+    .classList.toggle('visible', Store.sortCol !== null || hasTextFilters());
 }
 
 function resetAll() {
-  sortCol = null;
-  sortDir = 'desc';
-  [
-    'search',
-    'groupBy', 'groupByM',
-    'filterCat', 'filterCatM',
-    'filterBrand', 'filterBrandM',
-    'filterShop', 'filterShopM',
-    'filterWarranty', 'filterWarrantyM',
-    'filterStatus', 'filterStatusM',
-  ].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  groupBy = '';
-  openItemIds.clear();
+  Store.setSort(null, 'desc');
+  ['search', 'groupBy', 'groupByM', 'filterCat', 'filterCatM', 'filterBrand', 'filterBrandM',
+   'filterShop', 'filterShopM', 'filterWarranty', 'filterWarrantyM', 'filterStatus', 'filterStatusM',
+  ].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  Store.setGroupBy('');
+  Store.openItemIds.clear();
   updateResetBtn();
   updateFilterCount();
   render();
 }
 
-// ── FILTERING & SORTING ───────────────────────────────────────────────────────
-
 function getFiltered() {
-  const q = document.getElementById('search').value.toLowerCase().trim();
-  const cat = document.getElementById('filterCat').value;
+  const q     = document.getElementById('search').value.toLowerCase().trim();
+  const cat   = document.getElementById('filterCat').value;
   const brand = document.getElementById('filterBrand').value;
-  const shop = document.getElementById('filterShop').value;
-  const wf = document.getElementById('filterWarranty').value;
-  const sf = document.getElementById('filterStatus').value;
+  const shop  = document.getElementById('filterShop').value;
+  const wf    = document.getElementById('filterWarranty').value;
+  const sf    = document.getElementById('filterStatus').value;
 
-  let list = data.filter((it) => {
+  let list = Store.data.filter(it => {
     if (q) {
-      const hay = (
-        it.name +
-        ' ' +
-        (it.serialNumber || '') +
-        ' ' +
-        (it.brand || '') +
-        ' ' +
-        (it.note || '')
-      ).toLowerCase();
+      const hay = (it.name + ' ' + (it.serialNumber || '') + ' ' + (it.brand || '') + ' ' + (it.note || '')).toLowerCase();
       if (!hay.includes(q)) return false;
     }
-    if (cat && it.category !== cat) return false;
-    if (brand && it.brand !== brand) return false;
-    if (shop && it.shop !== shop) return false;
-    if (sf && it.status !== sf) return false;
+    if (cat   && it.category !== cat)   return false;
+    if (brand && it.brand    !== brand) return false;
+    if (shop  && it.shop     !== shop)  return false;
+    if (sf    && it.status   !== sf)    return false;
     if (wf) {
       const ws = warrantyStatus(it);
-      if (wf === 'ok' && ws.s !== 'ok') return false;
-      if (wf === 'warn' && ws.s !== 'warn') return false;
-      if (wf === 'expired' && ws.s !== 'expired') return false;
-      if (wf === 'none' && !['none', 'returned', 'written_off'].includes(ws.s)) return false;
+      if (wf === 'ok'      && ws.s !== 'ok')      return false;
+      if (wf === 'warn'    && ws.s !== 'warn')     return false;
+      if (wf === 'expired' && ws.s !== 'expired')  return false;
+      if (wf === 'none'    && !['none', 'returned', 'written_off'].includes(ws.s)) return false;
     }
     return true;
   });
 
-  if (sortCol) {
+  if (Store.sortCol) {
     list.sort((a, b) => {
       let cmp = 0;
-      if (sortCol === 'name') cmp = (a.name || '').localeCompare(b.name || '', 'ru');
-      if (sortCol === 'brand') cmp = (a.brand || '').localeCompare(b.brand || '', 'ru');
-      if (sortCol === 'date') cmp = (parseDate(a.date) || 0) - (parseDate(b.date) || 0);
-      if (sortCol === 'price') cmp = (a.price || 0) - (b.price || 0);
-      if (sortCol === 'warranty') {
+      if (Store.sortCol === 'name')     cmp = (a.name  || '').localeCompare(b.name  || '', 'ru');
+      if (Store.sortCol === 'brand')    cmp = (a.brand || '').localeCompare(b.brand || '', 'ru');
+      if (Store.sortCol === 'date')     cmp = (parseDate(a.date) || 0) - (parseDate(b.date) || 0);
+      if (Store.sortCol === 'price')    cmp = (a.price || 0) - (b.price || 0);
+      if (Store.sortCol === 'warranty') {
         const ea = warrantyEnd(a)?.getTime() ?? Infinity;
         const eb = warrantyEnd(b)?.getTime() ?? Infinity;
         cmp = ea - eb;
       }
-      return sortDir === 'desc' ? -cmp : cmp;
+      return Store.sortDir === 'desc' ? -cmp : cmp;
     });
   } else {
     list.sort((a, b) => (parseDate(b.date) || 0) - (parseDate(a.date) || 0));
@@ -280,24 +236,46 @@ function getFiltered() {
 }
 
 function handleColSort(col) {
-  if (sortCol === col) {
-    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  if (Store.sortCol === col) {
+    Store.setSort(col, Store.sortDir === 'asc' ? 'desc' : 'asc');
   } else {
-    sortCol = col;
-    sortDir = col === 'date' || col === 'price' ? 'desc' : 'asc';
+    Store.setSort(col, col === 'date' || col === 'price' ? 'desc' : 'asc');
   }
-  openItemIds.clear();
+  Store.openItemIds.clear();
   updateResetBtn();
   render();
 }
 
-// ── KEYBOARD ──────────────────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+  const id     = el.dataset.id;
 
-document.addEventListener('keydown', (e) => {
+  switch (action) {
+    case 'toggle-item':         toggleItem(id); break;
+    case 'toggle-group':        toggleGroup(id); break;
+    case 'sort-col':            handleColSort(el.dataset.col); break;
+    case 'edit-item':           openEdit(id); break;
+    case 'delete-item':         deleteItem(id); break;
+    case 'add-event':           openAddEvent(id); break;
+    case 'add-shop':            openAddShop(); break;
+    case 'edit-shop':           openEditShop(id); break;
+    case 'delete-shop':         deleteShop(id); break;
+    case 'add-cat':             openAddCat(); break;
+    case 'edit-cat':            openEditCat(id); break;
+    case 'delete-cat':          deleteCat(id); break;
+    case 'pick-color':          pickColor(el.dataset.color); break;
+    case 'remove-row':          el.closest('.spec-row-edit, .ev-edit-row, .receipt-row-edit')?.remove(); break;
+    case 'close-modal':         closeModal(el.dataset.modal); break;
+  }
+});
+
+document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     const sheet = document.getElementById('filterSheet');
     if (sheet && sheet.style.display !== 'none') { closeFilterSheet(); return; }
-    ['modalItem', 'modalShop', 'modalCat', 'modalEvent'].forEach((id) => {
+    ['modalItem', 'modalShop', 'modalCat', 'modalEvent'].forEach(id => {
       if (document.getElementById(id).style.display !== 'none') closeModal(id);
     });
   }
@@ -307,33 +285,17 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ── FILTER LISTENERS ──────────────────────────────────────────────────────────
-
-['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].forEach(
-  (id) => {
-    const el = document.getElementById(id);
-    el.addEventListener('input', () => {
-      openItemIds.clear();
-      updateResetBtn();
-      updateFilterCount();
-      render();
-    });
-    el.addEventListener('change', () => {
-      openItemIds.clear();
-      updateResetBtn();
-      updateFilterCount();
-      render();
-    });
-  }
-);
-
-document.getElementById('groupBy').addEventListener('change', (e) => {
-  groupBy = e.target.value;
-  openItemIds.clear();
-  render();
+['search', 'filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input',  () => { Store.openItemIds.clear(); updateResetBtn(); updateFilterCount(); render(); });
+  el.addEventListener('change', () => { Store.openItemIds.clear(); updateResetBtn(); updateFilterCount(); render(); });
 });
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('groupBy').addEventListener('change', e => {
+  Store.setGroupBy(e.target.value);
+  Store.openItemIds.clear();
+  render();
+});
 
 if (HAS_FSA) {
   const btn = document.getElementById('btnOpenDir');
@@ -341,80 +303,22 @@ if (HAS_FSA) {
   btn.addEventListener('click', connectDirectory);
 }
 
-document.getElementById('fileInput').addEventListener('change', (e) => {
+document.getElementById('fileInput').addEventListener('change', e => {
   if (e.target.files.length) loadMultipleFiles(e.target.files);
 });
 
 document.getElementById('btnEmpty').addEventListener('click', () => {
-  data = [];
-  shops = defaultShops();
-  cats = defaultCats();
+  Store.setData([]);
+  Store.setShops([]);
+  Store.setCats([]);
   showApp();
 });
 
 document.getElementById('listView').classList.add('active');
 
-// Keep --ctrl-h in sync with actual controls height so sticky thead is always correct
-new ResizeObserver((entries) => {
+new ResizeObserver(entries => {
   const h = entries[0]?.contentRect.height;
   if (h) document.documentElement.style.setProperty('--ctrl-h', h + 'px');
 }).observe(document.getElementById('controls'));
-
-// ── FILTER SHEET ──────────────────────────────────────────────────────────────
-
-function openFilterSheet() {
-  const gbM = document.getElementById('groupByM');
-  if (gbM) gbM.value = document.getElementById('groupBy').value;
-  ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
-    const d = document.getElementById('filter' + k);
-    const m = document.getElementById('filter' + k + 'M');
-    if (d && m) m.value = d.value;
-  });
-  document.getElementById('filterSheet').style.display = 'flex';
-}
-
-function closeFilterSheet() {
-  document.getElementById('filterSheet').style.display = 'none';
-}
-
-function applyFilterSheet() {
-  const gbM = document.getElementById('groupByM');
-  if (gbM) { document.getElementById('groupBy').value = gbM.value; groupBy = gbM.value; }
-  ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
-    const m = document.getElementById('filter' + k + 'M');
-    const d = document.getElementById('filter' + k);
-    if (m && d) d.value = m.value;
-  });
-  openItemIds.clear();
-  updateResetBtn();
-  updateFilterCount();
-  render();
-  closeFilterSheet();
-}
-
-function resetFiltersSheet() {
-  ['groupBy', 'groupByM'].forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
-  groupBy = '';
-  ['Cat', 'Brand', 'Shop', 'Warranty', 'Status'].forEach((k) => {
-    ['filter' + k, 'filter' + k + 'M'].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-  });
-  openItemIds.clear();
-  updateResetBtn();
-  updateFilterCount();
-  render();
-}
-
-function updateFilterCount() {
-  const n = ['filterCat', 'filterBrand', 'filterShop', 'filterWarranty', 'filterStatus'].filter(
-    (id) => document.getElementById(id)?.value
-  ).length;
-  const badge = document.getElementById('filterCount');
-  const btn = document.getElementById('btnFilterMobile');
-  if (badge) { badge.textContent = n; badge.style.display = n ? 'flex' : 'none'; }
-  if (btn) btn.classList.toggle('has-filters', n > 0);
-}
 
 updateFilterCount();

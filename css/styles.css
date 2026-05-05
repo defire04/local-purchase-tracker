@@ -682,6 +682,22 @@ textarea {
 .td-warranty {
   text-align: center;
 }
+.td-warranty .badge {
+  min-width: 76px;
+  justify-content: center;
+}
+.warranty-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.warranty-date {
+  font-size: .73rem;
+  color: var(--text3);
+  line-height: 1.2;
+  min-height: 1em;
+}
 .th-status,
 .td-status {
   text-align: center;

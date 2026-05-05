@@ -1,43 +1,24 @@
 'use strict';
 
 const COLOR_PALETTE = [
-  // Reds
   '#b91c1c','#ef4444','#f87171','#fca5a5',
-  // Pinks / Rose
   '#e11d48','#fb7185','#f472b6','#ec4899',
-  // Oranges
   '#c2410c','#f97316','#fb923c','#fdba74',
-  // Yellows
   '#a16207','#eab308','#fbbf24','#fcd34d',
-  // Greens
   '#15803d','#22c55e','#4ade80','#86efac',
-  // Emerald / Teal
   '#047857','#10b981','#34d399','#6ee7b7',
-  // Cyans
   '#0e7490','#06b6d4','#67e8f9',
-  // Sky / Blues
   '#1d4ed8','#3b82f6','#60a5fa','#93c5fd','#38bdf8',
-  // Indigo / Violet / Purple
   '#4338ca','#818cf8','#a5b4fc',
   '#6d28d9','#8b5cf6','#a78bfa',
   '#7e22ce','#c084fc',
-  // Fuchsia / Magenta
   '#a21caf','#e879f9','#d946ef',
-  // Neutrals
   '#64748b','#94a3b8','#8da0bc',
 ];
 
-let dirHandle = null, dataFH = null, shopsFH = null, catsFH = null;
-let data = [], shops = [], cats = [];
-let dirty = { data: false, shops: false, cats: false };
-let openItemIds = new Set();
-let currentView = 'list';
-let sortCol = null, sortDir = 'desc';
-let groupBy = '';
-
-function shopById(id)     { return shops.find(s => s.id === id); }
+function shopById(id)     { return Store.shops.find(s => s.id === id); }
 function shopName(id)     { const s = shopById(id); return s ? s.name : (id || '—'); }
-function catById(id)      { return cats.find(c => c.id === id); }
+function catById(id)      { return Store.cats.find(c => c.id === id); }
 function catIsService(id) { const c = catById(id); return c && c.isService; }
 
 function warrantyEnd(it) {
@@ -57,9 +38,9 @@ function warrantyStatus(item) {
   if (!end) return { s: 'none', label: T.wBadgeNone, end: null };
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const ml = Math.round((end - today) / (1000 * 60 * 60 * 24 * 30.44));
-  if (ml < 0)  return { s: 'expired', label: T.wBadgeExpired,          end };
-  if (ml <= 6) return { s: 'warn',    label: `${ml} ${T.months}`,   end };
-  return              { s: 'ok',      label: `${ml} ${T.months}`,   end };
+  if (ml < 0)  return { s: 'expired', label: T.wBadgeExpired,        end };
+  if (ml <= 6) return { s: 'warn',    label: `${ml} ${T.months}`,    end };
+  return              { s: 'ok',      label: `${ml} ${T.months}`,    end };
 }
 
 function wBadge(ws) {
@@ -73,7 +54,7 @@ function statusBadge(status) {
   const map = {
     active:      ['badge-status-active',      T.badgeActive],
     returned:    ['badge-status-returned',    T.badgeReturned],
-    written_off: ['badge-status-written_off', T.badgeWrittenOff]
+    written_off: ['badge-status-written_off', T.badgeWrittenOff],
   };
   const [cls, label] = map[status] || ['badge-none', status];
   return `<span class="badge ${cls}">${label}</span>`;
@@ -87,21 +68,13 @@ function shopBadge(shopId) {
   return `<span class="shop-badge" style="${style}">${esc(name)}</span>`;
 }
 
-function defaultShops() { return []; }
-
-function defaultCats() { return []; }
-
 function migrateItem(item) {
   if (item.receipt && !item.receipts) {
     const v = item.receipt;
     const isUrl = /^https?:\/\//.test(v);
     const isPdf = /\.pdf$/i.test(v);
     const type = isUrl ? 'url' : isPdf ? 'pdf' : 'photo';
-    item.receipts = [{
-      type,
-      label: T.rcptDefaultLabel[type],
-      value: v
-    }];
+    item.receipts = [{ type, label: T.rcptDefaultLabel[type], value: v }];
     delete item.receipt;
   }
   if (!item.receipts) item.receipts = [];

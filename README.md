@@ -1,4 +1,4 @@
-# Purchases Registry
+# Local Purchase Tracker
 
 Personal purchase tracker. Runs in the browser, data stays in local JSON files — no server, no cloud.
 

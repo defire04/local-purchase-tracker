@@ -38,16 +38,25 @@ The app shows different options depending on your browser's capabilities.
     "price": 1019,
     "warrantyMonths": 24,
     "serialNumber": "ABC123",
+    "executor": "",
     "status": "active",
     "note": "...",
+    "link": "https://...",
+    "ekLink": "https://ek.ua/...",
     "specs": { "Storage": "1 TB" },
-    "receipts": [{ "label": "Invoice", "url": "https://..." }],
-    "events": [{ "date": "01.01.2021", "note": "Repaired" }]
+    "receipts": [{ "type": "url", "label": "Invoice", "value": "https://..." }],
+    "events": [{ "date": "01.01.2021", "type": "repair", "note": "Fixed screen" }]
   }
 ]
 ```
 
 `status`: `active` · `returned` · `written_off`
+
+`receipts[].type`: `url` · `pdf` · `photo`
+
+`events[].type`: `warranty_claim` · `repair` · `returned` · `note`
+
+`executor` — used for service categories (contractor / company name); warranty and S/N are hidden for services.
 
 ### `shops.json` — stores
 ```json
@@ -74,14 +83,21 @@ The app shows different options depending on your browser's capabilities.
 ]
 ```
 
-`isService: true` — hides warranty and serial number fields for that category.
+`isService: true` — hides warranty, serial number, brand and specs fields for that category.
 
 ---
 
 ## Features
 
-- Search, filter by category / brand / shop / warranty / status
+- Search by name, order number, serial number
+- Filter by category / brand / shop / warranty / status
 - Group by order, shop, month, category
 - Warranty tracking with expiry alerts
 - Export to Excel
 - Works offline, no account needed
+
+---
+
+## License
+
+MIT © [defire04](https://github.com/defire04)

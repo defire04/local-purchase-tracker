@@ -34,9 +34,9 @@ function doExport() {
   if (scope === 'filtered') {
     items = getFiltered().filter(inRange);
   } else if (scope === 'active') {
-    items = Store.data.filter(it => it.status === 'active' && inRange(it));
+    items = AppContext.data.filter(it => it.status === 'active' && inRange(it));
   } else {
-    items = Store.data.filter(inRange);
+    items = AppContext.data.filter(inRange);
   }
 
   items.sort((a, b) => (parseDate(b.date) || 0) - (parseDate(a.date) || 0));
@@ -123,7 +123,7 @@ function generateExcel(items, from, to) {
     };
 
     const dateObj = parseDate(it.date);
-    const wEnd    = warrantyEnd(it);
+    const wEnd    = ItemService.warrantyEnd(it);
     const dateS   = { ...ctr, numFmt: 'DD.MM.YYYY' };
 
     const rcptTxt = (it.receipts || [])
@@ -134,8 +134,8 @@ function generateExcel(items, from, to) {
       })
       .join('\n');
 
-    const catObj  = Store.cats.find(c => c.id === it.category);
-    const shopObj = shopById(it.shop);
+    const catObj  = AppContext.cats.find(c => c.id === it.category);
+    const shopObj = ShopService.findById(it.shop);
 
     const s  = (v, st = base) => ({ v: v || '', t: 's', s: st });
     const n  = (v, st = rght, fmt = '#,##0') => v != null && v !== ''
@@ -190,9 +190,18 @@ function generateExcel(items, from, to) {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, T.navPurchases);
 
-  const fFrom = from ? from.replace(/-/g, '.') : '';
-  const fTo   = to   ? to.replace(/-/g, '.')   : '';
-  const suffix = fFrom && fTo ? `_${fFrom}–${fTo}` : fFrom ? `_${fFrom}` : fTo ? `_${fTo}` : '';
+  const fFrom = from ? from.replaceAll('-', '.') : '';
+  const fTo   = to   ? to.replaceAll('-', '.')   : '';
+  let suffix;
+  if (fFrom && fTo) {
+    suffix = `_${fFrom}–${fTo}`;
+  } else if (fFrom) {
+    suffix = `_${fFrom}`;
+  } else if (fTo) {
+    suffix = `_${fTo}`;
+  } else {
+    suffix = '';
+  }
   XLSX.writeFile(wb, `purchases${suffix}.xlsx`);
 
   toast(T.toastExported(items.length), 'ok');
@@ -203,7 +212,7 @@ function colLetter(idx) {
   idx++;
   while (idx > 0) {
     idx--;
-    s = String.fromCharCode(65 + (idx % 26)) + s;
+    s = String.fromCodePoint(65 + (idx % 26)) + s;
     idx = Math.floor(idx / 26);
   }
   return s;

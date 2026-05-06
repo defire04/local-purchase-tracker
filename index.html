@@ -235,7 +235,7 @@
             </div>
             <div class="form-group">
               <label data-i18n="lCat">Category</label>
-              <select id="fCat" onchange="onCatChange()"></select>
+              <select id="fCat" onchange="onCategoryChange()"></select>
             </div>
             <div class="form-group" id="fg-brand">
               <label data-i18n="lBrand">Brand</label>
@@ -488,19 +488,26 @@
 
     <!-- ════════════ SCRIPTS ════════════ -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script src="src/lang/ru.js"></script>
+    <script src="src/lang/uk.js"></script>
+    <script src="src/lang/en.js"></script>
     <script src="src/i18n.js"></script>
     <script src="src/utils.js"></script>
-    <script src="src/store.js"></script>
-    <script src="src/state.js"></script>
-    <script src="src/storage.js"></script>
+    <script src="src/app-context.js"></script>
+    <script src="src/repositories/item-repository.js"></script>
+    <script src="src/repositories/shop-repository.js"></script>
+    <script src="src/repositories/category-repository.js"></script>
+    <script src="src/storage-facade.js"></script>
     <script src="src/services/item-service.js"></script>
     <script src="src/services/shop-service.js"></script>
-    <script src="src/services/cat-service.js"></script>
+    <script src="src/services/category-service.js"></script>
+    <script src="src/ui/badges.js"></script>
     <script src="src/ui/list-view.js"></script>
     <script src="src/ui/settings-view.js"></script>
     <script src="src/ui/modals.js"></script>
     <script src="src/ui/filter-sheet.js"></script>
-    <script src="src/export.js"></script>
+    <script src="src/ui/filter-controller.js"></script>
+    <script src="src/ui/excel-exporter.js"></script>
     <script src="src/app.js"></script>
   </body>
 </html>

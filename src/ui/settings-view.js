@@ -2,11 +2,11 @@
 
 function renderSettings() {
   document.getElementById('settingsView').innerHTML =
-    `<div class="settings-grid">${renderShopsCard()}${renderCatsCard()}</div>`;
+    `<div class="settings-grid">${renderShopsCard()}${renderCategoriesCard()}</div>`;
 }
 
 function renderShopsCard() {
-  const rows = Store.shops.map(s => {
+  const rows = AppContext.shops.map(s => {
     const color = s.color || '#8da0bc';
     const style = `background:${hexToRgba(color, .15)};color:${color};border:1px solid ${hexToRgba(color, .3)}`;
     return `<div class="settings-list-item">
@@ -31,8 +31,8 @@ function renderShopsCard() {
   </div>`;
 }
 
-function renderCatsCard() {
-  const rows = Store.cats.map(c => `<div class="settings-list-item">
+function renderCategoriesCard() {
+  const rows = AppContext.cats.map(c => `<div class="settings-list-item">
     <div class="sli-info">
       <div class="sli-name">${esc(c.name)} ${c.isService ? '<span class="tag" style="font-size:.7rem">S</span>' : ''}</div>
     </div>

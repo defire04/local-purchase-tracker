@@ -1,6 +1,6 @@
 'use strict';
 
-const Store = (() => {
+const AppContext = (() => {
   let _dirHandle = null, _dataFH = null, _shopsFH = null, _catsFH = null;
   let _data = [], _shops = [], _cats = [];
   let _dirty = { data: false, shops: false, cats: false };

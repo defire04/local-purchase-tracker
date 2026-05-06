@@ -6,14 +6,13 @@ function uid() {
     : Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
-
 function esc(s) {
   if (s == null) return '';
   return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
 
 function parseDate(s) {
@@ -42,12 +41,12 @@ function fromInputDate(v) {
 
 function fmtPrice(n) {
   if (!n && n !== 0) return '—';
-  return Number(n).toLocaleString('ru-RU') + ' ₴';
+  return Number(n).toLocaleString('ru-RU') + ' ₴';
 }
 
 function hexToRgba(hex, a) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
+  const r = Number.parseInt(hex.slice(1, 3), 16);
+  const g = Number.parseInt(hex.slice(3, 5), 16);
+  const b = Number.parseInt(hex.slice(5, 7), 16);
   return `rgba(${r},${g},${b},${a})`;
 }

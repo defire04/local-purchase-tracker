@@ -11,7 +11,9 @@ function closeModal(id) {
 }
 
 function mbClose(e, id) {
-  if (e.target === document.getElementById(id)) closeModal(id);
+  if (e.target === document.getElementById(id)) {
+    closeModal(id);
+  }
 }
 
 function openAdd() {
@@ -30,18 +32,20 @@ function openAdd() {
   f('fEkLink').value = '';
   f('fNote').value = '';
   f('fStatus').value = 'active';
-  fillCatSelect('fCat', '');
+  fillCategorySelect('fCat', '');
   fillShopSelect('fShop', '');
   document.getElementById('specsEditor').innerHTML = '';
   document.getElementById('eventsEditor').innerHTML = '';
   document.getElementById('receiptsEditor').innerHTML = '';
-  onCatChange();
+  onCategoryChange();
   openModal('modalItem');
 }
 
 function openEdit(id) {
-  const it = Store.data.find(x => x.id === id);
-  if (!it) return;
+  const it = AppContext.data.find(x => x.id === id);
+  if (!it) {
+    return;
+  }
   const f = id => document.getElementById(id);
   document.getElementById('modalItemTitle').textContent = T.modalEditTitle;
   f('fId').value = it.id;
@@ -57,9 +61,9 @@ function openEdit(id) {
   f('fEkLink').value = it.ekLink || '';
   f('fNote').value = it.note || '';
   f('fStatus').value = it.status || 'active';
-  fillCatSelect('fCat', it.category || '');
+  fillCategorySelect('fCat', it.category || '');
   fillShopSelect('fShop', it.shop || '');
-  onCatChange();
+  onCategoryChange();
   document.getElementById('specsEditor').innerHTML = '';
   Object.entries(it.specs || {}).forEach(([k, v]) => addSpecRow(k, v));
   document.getElementById('eventsEditor').innerHTML = '';
@@ -69,48 +73,53 @@ function openEdit(id) {
   openModal('modalItem');
 }
 
-function fillCatSelect(selId, val) {
+function fillCategorySelect(selId, val) {
   const sel = document.getElementById(selId);
   sel.innerHTML = '';
-  Store.cats.forEach(c => {
+  AppContext.cats.forEach(c => {
     const o = document.createElement('option');
-    o.value = c.id; o.textContent = c.name;
+    o.value = c.id;
+    o.textContent = c.name;
     sel.appendChild(o);
   });
-  if (val) sel.value = val;
+  if (val) {
+    sel.value = val;
+  }
 }
 
 function fillShopSelect(selId, val) {
   const sel = document.getElementById(selId);
   sel.innerHTML = `<option value="">${T.noShop}</option>`;
-  Store.shops.forEach(s => {
+  AppContext.shops.forEach(s => {
     const o = document.createElement('option');
-    o.value = s.id; o.textContent = s.name;
+    o.value = s.id;
+    o.textContent = s.name;
     sel.appendChild(o);
   });
   if (val) {
     const exists = [...sel.options].some(o => o.value === val);
     if (!exists) {
       const o = document.createElement('option');
-      o.value = val; o.textContent = shopName(val);
+      o.value = val;
+      o.textContent = ShopService.getName(val);
       sel.appendChild(o);
     }
     sel.value = val;
   }
 }
 
-function onCatChange() {
-  const isSvc = catIsService(document.getElementById('fCat').value);
-  document.getElementById('fg-product').style.display  = isSvc ? 'none'  : 'block';
+function onCategoryChange() {
+  const isSvc = CategoryService.isService(document.getElementById('fCat').value);
+  document.getElementById('fg-product').style.display = isSvc ? 'none' : 'block';
   document.getElementById('fg-executor').style.display = isSvc ? 'block' : 'none';
-  document.getElementById('fg-ek').style.display       = isSvc ? 'none'  : 'flex';
-  document.getElementById('fg-brand').style.display    = isSvc ? 'none'  : 'flex';
-  document.getElementById('fg-specs').style.display    = isSvc ? 'none'  : 'flex';
+  document.getElementById('fg-ek').style.display = isSvc ? 'none' : 'flex';
+  document.getElementById('fg-brand').style.display = isSvc ? 'none' : 'flex';
+  document.getElementById('fg-specs').style.display = isSvc ? 'none' : 'flex';
 }
 
 function addSpecRow(key = '', val = '') {
   const ed = document.getElementById('specsEditor');
-  const d  = document.createElement('div');
+  const d = document.createElement('div');
   d.className = 'spec-row-edit';
   d.innerHTML = `<input type="text" placeholder="${T.phSpecKey}" value="${esc(key)}">
     <input type="text" placeholder="${T.phSpecVal}" value="${esc(val)}">
@@ -121,7 +130,7 @@ function addSpecRow(key = '', val = '') {
 function addEvRow(ev) {
   ev = ev || {};
   const ed = document.getElementById('eventsEditor');
-  const d  = document.createElement('div');
+  const d = document.createElement('div');
   d.className = 'ev-edit-row';
   d.innerHTML = `<input type="date" class="ev-d" value="${ev.date ? toInputDate(ev.date) : ''}">
     <select class="ev-t">
@@ -138,11 +147,11 @@ function addEvRow(ev) {
 function addReceiptRow(r) {
   r = r || {};
   const ed = document.getElementById('receiptsEditor');
-  const d  = document.createElement('div');
+  const d = document.createElement('div');
   d.className = 'receipt-row-edit';
   const typeOpts = [
-    { value: 'url',   label: T.rcptUrl   },
-    { value: 'pdf',   label: T.rcptPdf   },
+    { value: 'url', label: T.rcptUrl },
+    { value: 'pdf', label: T.rcptPdf },
     { value: 'photo', label: T.rcptPhoto },
   ].map(t => `<option value="${t.value}" ${r.type === t.value ? 'selected' : ''}>${t.label}</option>`).join('');
   d.innerHTML = `<select class="rcpt-type">${typeOpts}</select>
@@ -154,17 +163,23 @@ function addReceiptRow(r) {
 
 function saveItem() {
   const name = document.getElementById('fName').value.trim();
-  if (!name) { toast(T.toastEnterName, 'err'); return; }
+  if (!name) {
+    toast(T.toastEnterName, 'err');
+    return;
+  }
 
-  const fId   = document.getElementById('fId').value;
-  const cat   = document.getElementById('fCat').value;
-  const isSvc = catIsService(cat);
+  const fId = document.getElementById('fId').value;
+  const cat = document.getElementById('fCat').value;
+  const isSvc = CategoryService.isService(cat);
 
   const specs = {};
   document.querySelectorAll('#specsEditor .spec-row-edit').forEach(r => {
     const [ki, vi] = r.querySelectorAll('input');
-    const k = ki.value.trim(), v = vi.value.trim();
-    if (k) specs[k] = v;
+    const k = ki.value.trim();
+    const v = vi.value.trim();
+    if (k) {
+      specs[k] = v;
+    }
   });
 
   const events = [];
@@ -181,7 +196,7 @@ function saveItem() {
     const val = r.querySelector('.rcpt-value').value.trim();
     if (val) {
       receipts.push({
-        type:  r.querySelector('.rcpt-type').value,
+        type: r.querySelector('.rcpt-type').value,
         label: r.querySelector('.rcpt-label').value.trim(),
         value: val,
       });
@@ -189,28 +204,28 @@ function saveItem() {
   });
 
   ItemService.save({
-    id:             fId || uid(),
+    id: fId || uid(),
     name,
-    brand:          isSvc ? '' : document.getElementById('fBrand').value.trim(),
-    category:       cat,
-    shop:           document.getElementById('fShop').value,
-    order:          document.getElementById('fOrder').value.trim(),
-    date:           fromInputDate(document.getElementById('fDate').value),
-    price:          parseFloat(document.getElementById('fPrice').value) || 0,
+    brand: isSvc ? '' : document.getElementById('fBrand').value.trim(),
+    category: cat,
+    shop: document.getElementById('fShop').value,
+    order: document.getElementById('fOrder').value.trim(),
+    date: fromInputDate(document.getElementById('fDate').value),
+    price: parseFloat(document.getElementById('fPrice').value) || 0,
     warrantyMonths: isSvc ? 0 : (parseInt(document.getElementById('fWarranty').value) || 0),
-    serialNumber:   isSvc ? '' : document.getElementById('fSerial').value.trim(),
-    executor:       isSvc ? document.getElementById('fExecutor').value.trim() : '',
+    serialNumber: isSvc ? '' : document.getElementById('fSerial').value.trim(),
+    executor: isSvc ? document.getElementById('fExecutor').value.trim() : '',
     receipts,
-    link:           document.getElementById('fLink').value.trim(),
-    ekLink:         isSvc ? '' : document.getElementById('fEkLink').value.trim(),
-    specs:          isSvc ? {} : specs,
-    note:           document.getElementById('fNote').value.trim(),
-    status:         document.getElementById('fStatus').value,
+    link: document.getElementById('fLink').value.trim(),
+    ekLink: isSvc ? '' : document.getElementById('fEkLink').value.trim(),
+    specs: isSvc ? {} : specs,
+    note: document.getElementById('fNote').value.trim(),
+    status: document.getElementById('fStatus').value,
     events,
   });
 
   closeModal('modalItem');
-  Store.openItemIds.clear();
+  AppContext.openItemIds.clear();
   markDirty('data');
   buildFilters();
   render();
@@ -218,8 +233,10 @@ function saveItem() {
 }
 
 function deleteItem(id) {
-  const it = Store.data.find(x => x.id === id);
-  if (!confirm(T.confirmDelete(it?.name))) return;
+  const it = AppContext.data.find(x => x.id === id);
+  if (!confirm(T.confirmDelete(it?.name))) {
+    return;
+  }
   ItemService.remove(id);
   markDirty('data');
   buildFilters();
@@ -229,9 +246,9 @@ function deleteItem(id) {
 
 function openAddEvent(itemId) {
   document.getElementById('evItemId').value = itemId;
-  document.getElementById('evDate').value   = new Date().toISOString().slice(0, 10);
-  document.getElementById('evType').value   = 'warranty_claim';
-  document.getElementById('evNote').value   = '';
+  document.getElementById('evDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('evType').value = 'warranty_claim';
+  document.getElementById('evNote').value = '';
   openModal('modalEvent');
 }
 
@@ -242,12 +259,16 @@ function saveEvent() {
     type: document.getElementById('evType').value,
     note: document.getElementById('evNote').value.trim(),
   });
-  if (!it) return;
+  if (!it) {
+    return;
+  }
   closeModal('modalEvent');
   markDirty('data');
-  if (Store.openItemIds.has(id)) {
+  if (AppContext.openItemIds.has(id)) {
     const dtr = document.getElementById('dtr-' + id);
-    if (dtr) dtr.querySelector('.item-detail').innerHTML = renderDetail(it);
+    if (dtr) {
+      dtr.querySelector('.item-detail').innerHTML = renderDetail(it);
+    }
   }
   toast(T.toastEventAdded, 'ok');
 }
@@ -267,22 +288,26 @@ function pickColor(c) {
 
 function openAddShop() {
   document.getElementById('modalShopTitle').textContent = T.modalAddShop;
-  ['sId', 'sName', 'sUrl', 'sLogin', 'sNote'].forEach(id => document.getElementById(id).value = '');
+  ['sId', 'sName', 'sUrl', 'sLogin', 'sNote'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
   document.getElementById('sColor').value = '#60a5fa';
   buildColorPresets('#60a5fa');
   openModal('modalShop');
 }
 
 function openEditShop(id) {
-  const s = shopById(id);
-  if (!s) return;
+  const shop = ShopService.findById(id);
+  if (!shop) {
+    return;
+  }
   document.getElementById('modalShopTitle').textContent = T.modalEditShop;
-  document.getElementById('sId').value    = s.id;
-  document.getElementById('sName').value  = s.name || '';
-  document.getElementById('sUrl').value   = s.url || '';
-  document.getElementById('sLogin').value = s.login || '';
-  document.getElementById('sNote').value  = s.note || '';
-  const color = s.color || '#60a5fa';
+  document.getElementById('sId').value = shop.id;
+  document.getElementById('sName').value = shop.name || '';
+  document.getElementById('sUrl').value = shop.url || '';
+  document.getElementById('sLogin').value = shop.login || '';
+  document.getElementById('sNote').value = shop.note || '';
+  const color = shop.color || '#60a5fa';
   document.getElementById('sColor').value = color;
   buildColorPresets(color);
   openModal('modalShop');
@@ -290,14 +315,17 @@ function openEditShop(id) {
 
 function saveShop() {
   const name = document.getElementById('sName').value.trim();
-  if (!name) { toast(T.toastEnterName, 'err'); return; }
+  if (!name) {
+    toast(T.toastEnterName, 'err');
+    return;
+  }
   const fId = document.getElementById('sId').value;
   ShopService.save({
-    id:    fId || uid(),
+    id: fId || uid(),
     name,
-    url:   document.getElementById('sUrl').value.trim(),
+    url: document.getElementById('sUrl').value.trim(),
     login: document.getElementById('sLogin').value.trim(),
-    note:  document.getElementById('sNote').value.trim(),
+    note: document.getElementById('sNote').value.trim(),
     color: document.getElementById('sColor').value,
   });
   closeModal('modalShop');
@@ -308,8 +336,10 @@ function saveShop() {
 }
 
 function deleteShop(id) {
-  const s = shopById(id);
-  if (!confirm(T.confirmDelShop(s?.name))) return;
+  const shop = ShopService.findById(id);
+  if (!confirm(T.confirmDelShop(shop?.name))) {
+    return;
+  }
   ShopService.remove(id);
   markDirty('shops');
   buildFilters();
@@ -317,10 +347,10 @@ function deleteShop(id) {
   toast(T.toastDeleted);
 }
 
-let _editCatId = null;
+let _editCategoryId = null;
 
-function openAddCat() {
-  _editCatId = null;
+function openAddCategory() {
+  _editCategoryId = null;
   document.getElementById('cName').value = '';
   document.getElementById('cIsService').checked = false;
   document.getElementById('modalCatTitle').textContent = T.modalAddCat;
@@ -328,12 +358,14 @@ function openAddCat() {
   openModal('modalCat');
 }
 
-function openEditCat(id) {
-  const c = Store.cats.find(x => x.id === id);
-  if (!c) return;
-  _editCatId = id;
-  document.getElementById('cName').value = c.name;
-  document.getElementById('cIsService').checked = !!c.isService;
+function openEditCategory(id) {
+  const category = AppContext.cats.find(x => x.id === id);
+  if (!category) {
+    return;
+  }
+  _editCategoryId = id;
+  document.getElementById('cName').value = category.name;
+  document.getElementById('cIsService').checked = !!category.isService;
   document.getElementById('modalCatTitle').textContent = T.modalEditCat;
   document.getElementById('btnSaveCat').textContent = T.saveCatBtn;
   openModal('modalCat');
@@ -341,22 +373,33 @@ function openEditCat(id) {
 
 function saveCat() {
   const name = document.getElementById('cName').value.trim();
-  if (!name) { toast(T.toastEnterName, 'err'); return; }
-  CatService.save({ id: _editCatId || uid(), name, isService: document.getElementById('cIsService').checked });
+  if (!name) {
+    toast(T.toastEnterName, 'err');
+    return;
+  }
+  CategoryService.save({
+    id: _editCategoryId || uid(),
+    name,
+    isService: document.getElementById('cIsService').checked,
+  });
   closeModal('modalCat');
   markDirty('cats');
   buildFilters();
   renderSettings();
-  toast(_editCatId ? T.toastSaved : T.toastCatAdded, 'ok');
-  _editCatId = null;
+  toast(_editCategoryId ? T.toastSaved : T.toastCatAdded, 'ok');
+  _editCategoryId = null;
 }
 
-function deleteCat(id) {
-  const c     = Store.cats.find(x => x.id === id);
-  const inUse = Store.data.some(i => i.category === id);
-  if (inUse  && !confirm(T.confirmDelCatUsed(c?.name))) return;
-  if (!inUse && !confirm(T.confirmDelCat(c?.name)))     return;
-  CatService.remove(id);
+function deleteCategory(id) {
+  const category = AppContext.cats.find(x => x.id === id);
+  const inUse = AppContext.data.some(i => i.category === id);
+  if (inUse && !confirm(T.confirmDelCatUsed(category?.name))) {
+    return;
+  }
+  if (!inUse && !confirm(T.confirmDelCat(category?.name))) {
+    return;
+  }
+  CategoryService.remove(id);
   markDirty('cats');
   buildFilters();
   renderSettings();

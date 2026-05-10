@@ -13,7 +13,7 @@ const LANG_RU = {
   connectSub:
     'Уже есть файлы? Откройте папку или выберите их ниже.<br>Первый запуск — нажмите «Начать с пустыми данными».',
   connectOpen: '📁 Открыть папку с данными',
-  connectOpenSub: 'data.json, shops.json, categories.json',
+  connectOpenSub: 'data.json, shops.json, categories.json · чеки кладите в папку receipts/',
   connectFiles: '📄 Выбрать файлы данных',
   connectFilesSub: 'выбрать 3 файла: data.json, shops.json, categories.json',
   filtersTitle: 'Фильтры',

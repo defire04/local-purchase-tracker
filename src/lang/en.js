@@ -11,7 +11,7 @@ const LANG_EN = {
   connectSub:
     'Have data files? Open the folder or select them below.<br>First time? Click "Start with empty data".',
   connectOpen: '📁 Open data folder',
-  connectOpenSub: 'data.json, shops.json, categories.json',
+  connectOpenSub: 'data.json, shops.json, categories.json · put local receipts in receipts/ subfolder',
   connectFiles: '📄 Select data files',
   connectFilesSub: 'select 3 files: data.json, shops.json, categories.json',
   filtersTitle: 'Filters',

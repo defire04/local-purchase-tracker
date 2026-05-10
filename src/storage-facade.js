@@ -100,6 +100,22 @@ async function saveAll() {
   toast(T.toastDownloaded, 'ok');
 }
 
+async function openReceiptFile(filename) {
+  if (!AppContext.dirHandle) {
+    return;
+  }
+  try {
+    const receiptsDir = await AppContext.dirHandle.getDirectoryHandle('receipts');
+    const fh = await receiptsDir.getFileHandle(filename);
+    const file = await fh.getFile();
+    const url = URL.createObjectURL(file);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch {
+    toast(T.toastReadErr, 'err');
+  }
+}
+
 async function loadMultipleFiles(files) {
   const find = name => [...files].find(f => f.name === name);
   const dataFile = find('data.json');

@@ -44,6 +44,13 @@ function switchView(v) {
 }
 
 document.addEventListener('click', e => {
+  const rcptLink = e.target.closest('[data-receipt]');
+  if (rcptLink) {
+    e.preventDefault();
+    openReceiptFile(rcptLink.dataset.receipt);
+    return;
+  }
+
   const el = e.target.closest('[data-action]');
   if (!el) {
     return;

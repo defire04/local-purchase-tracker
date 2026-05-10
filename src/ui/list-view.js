@@ -240,8 +240,14 @@ function renderDetail(it) {
       icon = '📷';
     }
     const label = r.label || (T.rcptDefaultLabel?.[r.type] || r.type);
-    const href = /^https?:\/\//.test(r.value) ? r.value : `./receipts/${encodeURIComponent(r.value)}`;
-    docLinks.push(`<a class="btn btn-ghost btn-sm btn-block" href="${esc(href)}" target="_blank">${icon} ${esc(label)}</a>`);
+    const isUrl = /^https?:\/\//.test(r.value);
+    if (isUrl) {
+      docLinks.push(`<a class="btn btn-ghost btn-sm btn-block" href="${esc(r.value)}" target="_blank">${icon} ${esc(label)}</a>`);
+    } else if (AppContext.dirHandle) {
+      docLinks.push(`<a class="btn btn-ghost btn-sm btn-block" href="#" data-receipt="${esc(r.value)}">${icon} ${esc(label)}</a>`);
+    } else {
+      docLinks.push(`<a class="btn btn-ghost btn-sm btn-block" href="./receipts/${encodeURIComponent(r.value)}" target="_blank">${icon} ${esc(label)}</a>`);
+    }
   });
   if (it.link) {
     docLinks.push(`<a class="btn btn-ghost btn-sm btn-block" href="${esc(it.link)}" target="_blank">${T.shopLink}</a>`);

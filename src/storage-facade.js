@@ -93,9 +93,9 @@ async function saveAll() {
       return;
     }
   }
-  ItemRepository.download();
-  ShopRepository.download();
-  CategoryRepository.download();
+  if (AppContext.dirty.data)  ItemRepository.download();
+  if (AppContext.dirty.shops) ShopRepository.download();
+  if (AppContext.dirty.cats)  CategoryRepository.download();
   clearDirty();
   toast(T.toastDownloaded, 'ok');
 }

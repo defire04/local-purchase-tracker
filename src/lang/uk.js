@@ -198,4 +198,64 @@ const LANG_UK = {
   exSActive: 'Активний',
   exSReturned: 'Повернення',
   exSWrittenOff: 'Списаний',
+  importAiBtn: 'Імпорт через ІІ',
+  importModalTitle: 'Імпорт через ІІ',
+  importLblEk: 'Посилання на ek.ua (з характеристиками)',
+  importLblShop: 'Посилання на магазин (де замовив)',
+  importLblDesc: 'Опис / характеристики',
+  importLblReceipt: 'Файл чека',
+  importPickFile: '📎 Прикріпити файл',
+  importSaveFilesBtn: '💾 Зберегти файли',
+  importFileHint: '⚠ Перед збереженням скопіюйте файл(и) до папки receipts/ — не перейменовуйте, інакше посилання в записі не спрацює.',
+  importDescPh: 'Вставте характеристики або опис товару…',
+  importHowTitle: 'Як це працює',
+  importHowStep1: 'Заповни поля — встав посилання на ek.ua, магазин або характеристики.',
+  importHowStep2: 'Натисни «Скопіювати промт» і встав його в ChatGPT, Claude або будь-який ІІ.',
+  importHowStep3: 'Опиши товар ІІ — він поверне JSON.',
+  importHowStep4: 'Встав JSON нижче і натисни «Перевірити».',
+  importExampleTitle: 'Приклад результату',
+  importStep1: 'Крок 1 — Заповни дані і скопіюй промт',
+  importCopyPrompt: 'Скопіювати промт',
+  importPromptCopied: 'Промт скопійовано!',
+  importStep2: 'Крок 2 — Встав відповідь ІІ (JSON)',
+  importPastePh: 'Вставте JSON сюди…',
+  importPreviewBtn: 'Перевірити',
+  importSaveBtn: 'Імпортувати',
+  importErrJson: 'Невірний JSON — перевірте синтаксис',
+  importErrField: (f) => `Відсутнє або невірне поле: ${f}`,
+  importWarnShop: (id) => `Буде створено новий магазин: "${id}"`,
+  importWarnCat: (id) => `Буде створена нова категорія: "${id}"`,
+  toastImported: 'Товар імпортовано',
+  importPickReceiptsDir: 'У наступному діалозі виберіть папку receipts/',
+  importReceiptsCopied: (n) => `${n} файл(а) скопійовано в receipts/`,
+  importReceiptsNoDir: 'Не вдалося скопіювати файли — відкрийте папку через «Відкрити папку з даними»',
+  importReceiptsDownloaded: 'Файли завантажено — покладіть їх у папку receipts/',
+  importPromptFn: (shops, cats) => `Ти допомагаєш заповнити базу покупок. Поверни ТІЛЬКИ валідний JSON у блоці \`\`\`json без пояснень.
+
+Схема:
+{
+  "name": "string (обов'язково)",
+  "brand": "string або ''",
+  "category": "один з: ${cats}",
+  "shop": "один з: ${shops}",
+  "order": "string або ''",
+  "date": "DD.MM.YYYY",
+  "price": number,
+  "warrantyMonths": number (0 = без гарантії),
+  "serialNumber": "string або ''",
+  "link": "URL або ''",
+  "note": "string або ''",
+  "status": "active",
+  "receipts": [{ "type": "photo|pdf|url", "label": "", "value": "ім'я файлу або URL" }],
+  "specs": { "ключ": "рядок" },
+  "events": []
+}
+
+Доступні магазини: ${shops}
+Доступні категорії: ${cats}
+
+Якщо потрібного магазину/категорії немає — придумай id у стилі snake_case.
+Всі значення в specs мають бути рядками, не масивами.
+Якщо термін гарантії явно не вказано в контексті — встав warrantyMonths: 0. Не вгадуй.
+Якщо дата покупки невідома — залиш date порожнім рядком "".`,
 };

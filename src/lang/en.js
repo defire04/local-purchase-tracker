@@ -198,4 +198,64 @@ const LANG_EN = {
   exSActive: 'Active',
   exSReturned: 'Returned',
   exSWrittenOff: 'Written off',
+  importAiBtn: 'Import via AI',
+  importModalTitle: 'Import via AI',
+  importLblEk: 'ek.ua link (with specs)',
+  importLblShop: 'Shop link (where ordered)',
+  importLblDesc: 'Description / specs',
+  importLblReceipt: 'Receipt file',
+  importPickFile: '📎 Attach file',
+  importSaveFilesBtn: '💾 Save files',
+  importFileHint: '⚠ Before saving, copy the file(s) to the receipts/ folder — do not rename them, otherwise the link in the record will not work.',
+  importDescPh: 'Paste product specs or description here…',
+  importHowTitle: 'How it works',
+  importHowStep1: 'Fill in the fields — paste the ek.ua link, shop link, or specs text.',
+  importHowStep2: 'Click "Copy prompt for AI" and paste it into ChatGPT, Claude, or any AI.',
+  importHowStep3: 'Describe the product to the AI — it will return a JSON.',
+  importHowStep4: 'Paste the JSON below and click "Preview".',
+  importExampleTitle: 'Example result',
+  importStep1: 'Step 1 — Fill in item info and copy the prompt',
+  importCopyPrompt: 'Copy prompt for AI',
+  importPromptCopied: 'Prompt copied!',
+  importStep2: 'Step 2 — Paste AI response (JSON)',
+  importPastePh: 'Paste JSON here…',
+  importPreviewBtn: 'Preview',
+  importSaveBtn: 'Import',
+  importErrJson: 'Invalid JSON — check syntax',
+  importErrField: (f) => `Missing or invalid field: ${f}`,
+  importWarnShop: (id) => `New shop will be created: "${id}"`,
+  importWarnCat: (id) => `New category will be created: "${id}"`,
+  toastImported: 'Item imported',
+  importPickReceiptsDir: 'Select your receipts/ folder in the next dialog',
+  importReceiptsCopied: (n) => `${n} file(s) copied to receipts/`,
+  importReceiptsNoDir: 'Could not copy files — open the data folder via "Open data folder"',
+  importReceiptsDownloaded: 'Files downloaded — move them to the receipts/ folder',
+  importPromptFn: (shops, cats) => `You help fill a purchases registry. Return ONLY a valid JSON in a \`\`\`json block, no explanations.
+
+Schema:
+{
+  "name": "string (required)",
+  "brand": "string or ''",
+  "category": "one of: ${cats}",
+  "shop": "one of: ${shops}",
+  "order": "string or ''",
+  "date": "DD.MM.YYYY",
+  "price": number,
+  "warrantyMonths": number (0 = no warranty),
+  "serialNumber": "string or ''",
+  "link": "URL or ''",
+  "note": "string or ''",
+  "status": "active",
+  "receipts": [{ "type": "photo|pdf|url", "label": "", "value": "filename or URL" }],
+  "specs": { "key": "string value" },
+  "events": []
+}
+
+Available shops: ${shops}
+Available categories: ${cats}
+
+If the needed shop or category doesn't exist — invent an id in snake_case style.
+All values in specs must be strings, not arrays.
+If warranty period is not explicitly stated in the context — set warrantyMonths: 0. Do not guess.
+If purchase date is unknown — leave date as an empty string "".`,
 };

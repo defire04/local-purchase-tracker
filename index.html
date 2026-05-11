@@ -74,6 +74,9 @@
           <button class="btn btn-secondary btn-sm btn-block" onclick="saveAll()">
             <span class="btn-ico">💾</span><span class="btn-lbl" data-i18n="save">Save</span>
           </button>
+          <button class="btn btn-ghost btn-sm btn-block" data-action="open-import">
+            <span class="btn-ico">🤖</span><span class="btn-lbl" data-i18n="importAiBtn">Import via AI</span>
+          </button>
           <button class="btn btn-primary btn-sm btn-block" onclick="openAdd()">
             <span class="btn-ico">✚</span><span class="btn-lbl" data-i18n="addItem">Add item</span>
           </button>
@@ -441,6 +444,100 @@
       </div>
     </div>
 
+    <!-- ════════════ MODAL: IMPORT VIA AI ════════════ -->
+    <div class="modal-backdrop" id="modalImport" style="display: none" onclick="mbClose(event, 'modalImport')">
+      <div class="modal import-modal-wide">
+        <div class="modal-hd">
+          <h2 data-i18n="importModalTitle">Import via AI</h2>
+          <button class="modal-close" onclick="closeModal('modalImport')">×</button>
+        </div>
+        <div class="modal-body import-modal-body">
+
+          <!-- LEFT: input fields -->
+          <div class="import-col-inputs">
+            <div class="form-group">
+              <label data-i18n="importLblEk">ek.ua link (with specs)</label>
+              <input type="url" id="importEkLink" placeholder="https://ek.ua/ua/prices/…" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="importLblShop">Shop link (where ordered)</label>
+              <input type="url" id="importShopLink" placeholder="https://rozetka.com.ua/…" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="importLblDesc">Description / specs</label>
+              <textarea id="importDesc" class="import-desc-input" data-i18n-ph="importDescPh" placeholder="Paste product specs or description here…" rows="5"></textarea>
+            </div>
+            <div class="form-group">
+              <label data-i18n="importLblReceipt">Receipt file</label>
+              <div class="import-file-row">
+                <input type="file" id="importFileInput" style="display:none" accept="image/*,.pdf" multiple onchange="_importFileChanged(this)" />
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFileInput').click()" data-i18n="importPickFile">📎 Attach file</button>
+                <button class="btn btn-ghost btn-sm" id="importSaveFilesBtn" style="display:none" data-action="save-receipt-files" data-i18n="importSaveFilesBtn">💾 Save files</button>
+              </div>
+              <div id="importFileNames" class="import-file-names">
+              </div>
+              <p class="import-file-hint" data-i18n="importFileHint"></p>
+            </div>
+            <button class="btn btn-primary" data-action="copy-prompt">
+              <span class="btn-ico">📋</span><span class="btn-lbl" data-i18n="importCopyPrompt">Copy prompt for AI</span>
+            </button>
+          </div>
+
+          <!-- RIGHT: instructions + example -->
+          <div class="import-col-help">
+            <div class="import-how-title" data-i18n="importHowTitle">How it works</div>
+            <ol class="import-steps-list">
+              <li data-i18n="importHowStep1">Fill in the fields — paste the ek.ua link, shop link, or specs text.</li>
+              <li data-i18n="importHowStep2">Click "Copy prompt" and paste it into ChatGPT, Claude or any other AI.</li>
+              <li data-i18n="importHowStep3">Ask the AI about the product — it will return a JSON.</li>
+              <li data-i18n="importHowStep4">Paste the JSON below and click "Preview".</li>
+            </ol>
+            <div class="import-example-title" data-i18n="importExampleTitle">Example AI response</div>
+            <pre class="import-example-json">{
+  "name": "Gigabyte MO27Q28G 27\"",
+  "brand": "Gigabyte",
+  "category": "electronics",
+  "shop": "foxtrot_ua",
+  "date": "11.05.2026",
+  "price": 29999,
+  "warrantyMonths": 12,
+  "serialNumber": "",
+  "specs": {
+    "Матрица": "OLED",
+    "Разрешение": "2560x1440",
+    "Частота": "280 Гц"
+  },
+  "receipts": [],
+  "events": []
+}</pre>
+          </div>
+
+        </div>
+
+        <!-- Step 2: full-width JSON area -->
+        <div class="import-json-section">
+          <div class="import-step-label" data-i18n="importStep2">Step 2 — Paste AI response (JSON)</div>
+          <textarea
+            id="importJsonInput"
+            class="import-json-input"
+            data-i18n-ph="importPastePh"
+            placeholder="Paste JSON here…"
+            rows="5"
+            autocomplete="off"
+            spellcheck="false"
+            oninput="_importTextareaChanged()"
+          ></textarea>
+          <div id="importPreview" class="import-preview"></div>
+        </div>
+
+        <div class="modal-ft">
+          <button class="btn btn-ghost" onclick="closeModal('modalImport')" data-i18n="cancelBtn">Cancel</button>
+          <button class="btn btn-secondary" data-action="import-preview" data-i18n="importPreviewBtn">Preview</button>
+          <button class="btn btn-primary" id="importSaveBtn" style="display: none" data-action="import-save" data-i18n="importSaveBtn">Import</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ════════════ MODAL: EXPORT ════════════ -->
     <div class="modal-backdrop" id="modalExport" style="display: none" onclick="mbClose(event, 'modalExport')">
       <div class="modal" style="max-width: 440px">
@@ -508,6 +605,7 @@
     <script src="src/ui/filter-sheet.js"></script>
     <script src="src/ui/filter-controller.js"></script>
     <script src="src/ui/excel-exporter.js"></script>
+    <script src="src/ui/import-modal.js"></script>
     <script src="src/app.js"></script>
   </body>
 </html>

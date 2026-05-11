@@ -74,6 +74,11 @@ document.addEventListener('click', e => {
     case 'pick-color':    pickColor(el.dataset.color); break;
     case 'remove-row':    el.closest('.spec-row-edit, .ev-edit-row, .receipt-row-edit')?.remove(); break;
     case 'close-modal':   closeModal(el.dataset.modal); break;
+    case 'open-import':        openImportModal(); break;
+    case 'copy-prompt':        copyImportPrompt(); break;
+    case 'import-preview':     previewImport(); break;
+    case 'import-save':        saveImport().catch(e => toast(e.message, 'err')); break;
+    case 'save-receipt-files': saveReceiptFiles().catch(e => toast(e.message, 'err')); break;
   }
 });
 
@@ -84,7 +89,7 @@ document.addEventListener('keydown', e => {
       closeFilterSheet();
       return;
     }
-    ['modalItem', 'modalShop', 'modalCat', 'modalEvent'].forEach(id => {
+    ['modalItem', 'modalShop', 'modalCat', 'modalEvent', 'modalImport'].forEach(id => {
       if (document.getElementById(id).style.display !== 'none') {
         closeModal(id);
       }

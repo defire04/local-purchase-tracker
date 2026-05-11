@@ -220,4 +220,64 @@ const LANG_RU = {
   exSActive: 'Активен',
   exSReturned: 'Возврат',
   exSWrittenOff: 'Списан',
+  importAiBtn: 'Импорт через ИИ',
+  importModalTitle: 'Импорт через ИИ',
+  importLblEk: 'Ссылка на ek.ua (с характеристиками)',
+  importLblShop: 'Ссылка на магазин (где заказал)',
+  importLblDesc: 'Описание / характеристики',
+  importLblReceipt: 'Файл чека',
+  importPickFile: '📎 Прикрепить файл',
+  importSaveFilesBtn: '💾 Сохранить файлы',
+  importFileHint: '⚠ Перед сохранением скопируйте файл(ы) в папку receipts/ — не переименовывайте, иначе ссылка в записи не сработает.',
+  importDescPh: 'Вставьте характеристики или описание товара…',
+  importHowTitle: 'Как это работает',
+  importHowStep1: 'Заполни поля — вставь ссылку на ek.ua, магазин или характеристики.',
+  importHowStep2: 'Нажми «Скопировать промт» и вставь его в ChatGPT, Claude или любой ИИ.',
+  importHowStep3: 'Опиши товар ИИ — он вернёт JSON.',
+  importHowStep4: 'Вставь JSON ниже и нажми «Проверить».',
+  importExampleTitle: 'Пример ответа ИИ',
+  importStep1: 'Шаг 1 — Заполни данные и скопируй промт',
+  importCopyPrompt: 'Скопировать промт',
+  importPromptCopied: 'Промт скопирован!',
+  importStep2: 'Шаг 2 — Вставь ответ ИИ (JSON)',
+  importPastePh: 'Вставьте JSON сюда…',
+  importPreviewBtn: 'Проверить',
+  importSaveBtn: 'Импортировать',
+  importErrJson: 'Неверный JSON — проверьте синтаксис',
+  importErrField: (f) => `Отсутствует или неверное поле: ${f}`,
+  importWarnShop: (id) => `Будет создан новый магазин: "${id}"`,
+  importWarnCat: (id) => `Будет создана новая категория: "${id}"`,
+  toastImported: 'Товар импортирован',
+  importPickReceiptsDir: 'В следующем диалоге выберите папку receipts/',
+  importReceiptsCopied: (n) => `${n} файл(а) скопировано в receipts/`,
+  importReceiptsNoDir: 'Не удалось скопировать файлы — откройте папку через «Открыть папку с данными»',
+  importReceiptsDownloaded: 'Файлы скачаны — положите их в папку receipts/',
+  importPromptFn: (shops, cats) => `Ты помогаешь заполнить базу покупок. Верни ТОЛЬКО валидный JSON в блоке \`\`\`json без пояснений.
+
+Схема:
+{
+  "name": "string (обязательно)",
+  "brand": "string или ''",
+  "category": "один из: ${cats}",
+  "shop": "один из: ${shops}",
+  "order": "string или ''",
+  "date": "DD.MM.YYYY",
+  "price": number,
+  "warrantyMonths": number (0 = без гарантии),
+  "serialNumber": "string или ''",
+  "link": "URL или ''",
+  "note": "string или ''",
+  "status": "active",
+  "receipts": [{ "type": "photo|pdf|url", "label": "", "value": "имя файла или URL" }],
+  "specs": { "ключ": "строка" },
+  "events": []
+}
+
+Доступные магазины: ${shops}
+Доступные категории: ${cats}
+
+Если нужного магазина/категории нет — придумай id в стиле snake_case.
+Все значения в specs должны быть строками, не массивами.
+Если срок гарантии явно не указан в контексте — ставь warrantyMonths: 0. Не угадывай.
+Если дата покупки неизвестна — оставь date пустой строкой "".`,
 };

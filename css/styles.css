@@ -1953,7 +1953,8 @@ body.modal-open {
     flex-direction: column !important;
   }
   .import-col-inputs {
-    flex: none;
+    flex: 1;
+    width: 100%;
   }
   .import-col-help {
     display: none;

@@ -1,13 +1,45 @@
 'use strict';
 
+let _amountsVisible = localStorage.getItem('pr_amounts_visible') === '1';
+
+function toggleAmountsVisible() {
+  _amountsVisible = !_amountsVisible;
+  localStorage.setItem('pr_amounts_visible', _amountsVisible ? '1' : '0');
+  render();
+}
+
+function updateEyeIcon() {
+  const btn = document.getElementById('btnToggleAmounts');
+  if (!btn) {
+    return;
+  }
+  btn.textContent = _amountsVisible ? '👁️' : '🙈';
+  btn.title = _amountsVisible ? T.amountsHideBtn : T.amountsShowBtn;
+}
+
+function renderFxStat(total) {
+  const el = document.getElementById('statFx');
+  if (!el) {
+    return;
+  }
+  if (!_amountsVisible) {
+    el.textContent = '';
+    return;
+  }
+  const rate = FxService.getRate();
+  el.textContent = rate ? ' · ≈' + Math.round(total / rate).toLocaleString('ru-RU') + ' $' : '';
+}
+
 function render() {
   if (AppContext.currentView !== 'list') {
     return;
   }
+  updateEyeIcon();
   const list = getFiltered();
   const total = list.reduce((s, i) => s + (i.price || 0), 0);
   document.getElementById('statCount').textContent = list.length;
-  document.getElementById('statSum').textContent = fmtPrice(total);
+  document.getElementById('statSum').textContent = _amountsVisible ? fmtPrice(total) : '•••••';
+  renderFxStat(total);
   updateResetBtn();
 
   const el = document.getElementById('listView');

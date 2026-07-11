@@ -32,11 +32,12 @@ function renderShopsCard() {
 }
 
 function renderCategoriesCard() {
-  const rows = AppContext.cats.map(c => `<div class="settings-list-item">
+  const rows = AppContext.cats.map(c => `<div class="settings-list-item${c.hidden ? ' is-hidden-cat' : ''}">
     <div class="sli-info">
-      <div class="sli-name">${esc(c.name)} ${c.isService ? '<span class="tag" style="font-size:.7rem">S</span>' : ''}</div>
+      <div class="sli-name">${esc(c.name)} ${c.isService ? '<span class="tag" style="font-size:.7rem">S</span>' : ''} ${c.hidden ? `<span class="tag" style="font-size:.7rem">${T.hiddenTag}</span>` : ''}</div>
     </div>
     <div class="sli-actions">
+      <button class="btn btn-ghost btn-sm btn-icon" data-action="toggle-cat-hidden" data-id="${esc(c.id)}" title="${c.hidden ? T.showCatBtn : T.hideCatBtn}">${c.hidden ? '🙈' : '👁️'}</button>
       <button class="btn btn-ghost btn-sm btn-icon" data-action="edit-cat" data-id="${esc(c.id)}" title="${T.editBtn}">✏️</button>
       <button class="btn btn-danger btn-sm btn-icon" data-action="delete-cat" data-id="${esc(c.id)}" title="${T.deleteBtn}">🗑</button>
     </div>

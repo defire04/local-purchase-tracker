@@ -524,10 +524,37 @@ textarea {
   flex-shrink: 0;
   padding-right: 88px;
 }
+.stats-bar-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.btn-eye {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0.15rem;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--text3);
+  cursor: pointer;
+  border-radius: var(--r4);
+  transition: background 0.15s, color 0.15s;
+}
+.btn-eye:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
 .stats-bar {
   font-size: 0.88rem;
   color: var(--text3);
   white-space: nowrap;
+}
+.stats-money {
+  display: inline-block;
+  min-width: 15ch;
 }
 .stats-bar b {
   color: var(--text);
@@ -1318,6 +1345,9 @@ body.modal-open {
 }
 .settings-list-item:last-child {
   border-bottom: none;
+}
+.is-hidden-cat {
+  opacity: 0.55;
 }
 .sli-info {
   flex: 1;

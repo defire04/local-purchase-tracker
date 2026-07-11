@@ -146,9 +146,12 @@
               <button class="btn-reset" id="btnReset" onclick="resetAll()" data-i18n="resetBtn"
                 >✕ Reset</button
               >
-              <div class="stats-bar"
-                ><b id="statCount">0</b> <span data-i18n="positions">items</span> ·
-                <b id="statSum">0</b></div
+              <div class="stats-bar-wrap"
+                ><button class="btn-eye" id="btnToggleAmounts" onclick="toggleAmountsVisible()">🙈</button
+                ><div class="stats-bar"
+                  ><b id="statCount">0</b> <span data-i18n="positions">items</span> ·
+                  <span class="stats-money"><b id="statSum">0</b><span id="statFx"></span></span></div
+                ></div
               >
             </div>
           </div>
@@ -598,6 +601,7 @@
     <script src="src/services/item-service.js"></script>
     <script src="src/services/shop-service.js"></script>
     <script src="src/services/category-service.js"></script>
+    <script src="src/services/fx-service.js"></script>
     <script src="src/ui/badges.js"></script>
     <script src="src/ui/list-view.js"></script>
     <script src="src/ui/settings-view.js"></script>

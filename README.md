@@ -79,12 +79,15 @@ To attach local receipts (PDF, photos), place them in a `receipts/` subfolder in
   {
     "id": "uuid",
     "name": "Electronics",
-    "isService": false
+    "isService": false,
+    "hidden": false
   }
 ]
 ```
 
 `isService: true` — hides warranty, serial number, brand and specs fields for that category.
+
+`hidden: true` — excludes this category's items from the default (unfiltered) list and totals; still selectable when adding/editing items, and still shown if explicitly selected in the category filter.
 
 ---
 

@@ -377,10 +377,12 @@ function saveCat() {
     toast(T.toastEnterName, 'err');
     return;
   }
+  const existing = _editCategoryId ? CategoryService.findById(_editCategoryId) : null;
   CategoryService.save({
     id: _editCategoryId || uid(),
     name,
     isService: document.getElementById('cIsService').checked,
+    hidden: existing ? existing.hidden : false,
   });
   closeModal('modalCat');
   markDirty('cats');
@@ -404,4 +406,16 @@ function deleteCategory(id) {
   buildFilters();
   renderSettings();
   toast(T.toastDeleted);
+}
+
+function toggleCategoryHidden(id) {
+  const category = CategoryService.findById(id);
+  if (!category) {
+    return;
+  }
+  category.hidden = !category.hidden;
+  markDirty('cats');
+  buildFilters();
+  render();
+  renderSettings();
 }

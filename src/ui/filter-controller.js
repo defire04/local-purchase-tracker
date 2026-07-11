@@ -172,6 +172,9 @@ function getFiltered() {
         return false;
       }
     }
+    if (!cat && CategoryService.isHidden(it.category)) {
+      return false;
+    }
     if (cat && it.category !== cat) {
       return false;
     }

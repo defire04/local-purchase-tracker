@@ -27,8 +27,10 @@ function clearDirty() {
 function showApp() {
   document.getElementById('connectScreen').style.display = 'none';
   document.getElementById('mainApp').classList.add('visible');
+  FxService.loadCached();
   buildFilters();
   render();
+  FxService.refreshIfNeeded(() => renderFxStat(getFiltered().reduce((s, i) => s + (i.price || 0), 0)));
 }
 
 function switchView(v) {
@@ -71,6 +73,7 @@ document.addEventListener('click', e => {
     case 'add-cat':       openAddCategory(); break;
     case 'edit-cat':      openEditCategory(id); break;
     case 'delete-cat':    deleteCategory(id); break;
+    case 'toggle-cat-hidden': toggleCategoryHidden(id); break;
     case 'pick-color':    pickColor(el.dataset.color); break;
     case 'remove-row':    el.closest('.spec-row-edit, .ev-edit-row, .receipt-row-edit')?.remove(); break;
     case 'close-modal':   closeModal(el.dataset.modal); break;

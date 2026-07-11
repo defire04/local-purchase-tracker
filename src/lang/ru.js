@@ -139,6 +139,11 @@ const LANG_RU = {
   isServiceLbl: 'Это услуга (скрыть гарантию и S/N)',
   addCatBtn: 'Добавить',
   saveCatBtn: 'Сохранить',
+  hideCatBtn: 'Скрыть товары этой категории из списка',
+  showCatBtn: 'Показать товары этой категории в списке',
+  hiddenTag: 'скрыта',
+  amountsShowBtn: 'Показать суммы',
+  amountsHideBtn: 'Скрыть суммы',
   // Modal event
   modalAddEvent: 'Добавить событие',
   lEvDate: 'Дата',

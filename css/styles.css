@@ -886,6 +886,7 @@ textarea {
   font-size: 0.9rem;
   color: var(--text2);
   margin-top: 0.85rem;
+  white-space: pre-wrap;
 }
 .dr-section {
   display: flex;

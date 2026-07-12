@@ -627,6 +627,9 @@ textarea {
 #settingsView {
   display: none;
 }
+#listView {
+  padding: 1.25rem 1.5rem 2.5rem;
+}
 #listView.active,
 #settingsView.active {
   display: block;
@@ -638,30 +641,40 @@ textarea {
 /* ── TABLE ───────────────────────────────────────────────────────── */
 .items-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   font-size: 1rem;
   table-layout: fixed;
 }
+.items-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+.items-table thead th:last-child {
+  border-top-right-radius: 12px;
+}
 .items-table col.col-name {
-  width: 28%;
+  width: auto;
 }
 .items-table col.col-brand {
-  width: 9%;
+  width: 150px;
 }
 .items-table col.col-shop {
-  width: 16%;
+  width: 260px;
 }
 .items-table col.col-date {
-  width: 8%;
+  width: 120px;
 }
 .items-table col.col-price {
-  width: 9%;
+  width: 130px;
 }
 .items-table col.col-warranty {
-  width: 12%;
+  width: 150px;
 }
 .items-table col.col-status {
-  width: 7%;
+  width: 110px;
 }
 
 .items-table thead {
@@ -831,10 +844,12 @@ textarea {
 .td-name-inner {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0.2rem;
   min-width: 0;
 }
 .td-name-inner > span:first-child {
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1680,6 +1695,10 @@ body.modal-open {
   }
   .search-wrap {
     min-width: 80px;
+  }
+
+  #listView {
+    padding: 0.5rem 0.5rem 2rem;
   }
 
   /* Hide price column, reveal inline */

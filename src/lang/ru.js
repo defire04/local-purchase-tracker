@@ -62,6 +62,7 @@ const LANG_RU = {
   specSerial: 'Серийный номер',
   specWarranty: 'Гарантия',
   specExecutor: 'Исполнитель',
+  specUsdRate: 'Курс $ на дату покупки',
   months: 'мес.',
   until: '→',
   // Warranty badge labels

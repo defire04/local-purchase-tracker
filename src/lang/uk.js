@@ -56,6 +56,7 @@ const LANG_UK = {
   specSerial: 'Серійний номер',
   specWarranty: 'Гарантія',
   specExecutor: 'Виконавець',
+  specUsdRate: 'Курс $ на дату покупки',
   months: 'міс.',
   until: '→',
   wBadgeReturned: 'Повернення',

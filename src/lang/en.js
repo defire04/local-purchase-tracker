@@ -56,6 +56,7 @@ const LANG_EN = {
   specSerial: 'Serial number',
   specWarranty: 'Warranty',
   specExecutor: 'Executor',
+  specUsdRate: 'USD rate on purchase date',
   months: 'mo.',
   until: '→',
   wBadgeReturned: 'Returned',

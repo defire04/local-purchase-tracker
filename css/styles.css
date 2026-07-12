@@ -832,6 +832,12 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  min-width: 0;
+}
+.td-name-inner > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .td-brand {
   color: var(--text2);

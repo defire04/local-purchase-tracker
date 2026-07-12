@@ -215,7 +215,7 @@ function renderItemTr(it, gid) {
   const hidden = gid ? ' style="display:none"' : '';
   return `<tr class="item-tr${isOpen ? ' open' : ''}" id="itr-${it.id}"
     data-group="${gid || ''}" data-id="${it.id}" data-action="toggle-item"${hidden}>
-    <td class="td-name"><div class="td-name-inner"><span>${esc(it.name)}</span>
+    <td class="td-name"><div class="td-name-inner"><span title="${esc(it.name)}">${esc(it.name)}</span>
       ${it.serialNumber ? `<code style="font-size:.78rem">🔑 ${esc(it.serialNumber)}</code>` : ''}
       <div class="mobile-meta"><span class="mm-price">${fmtPrice(it.price)}</span><span class="mm-warranty">${wBadge(ws)}</span>${statusBadge(it.status)}</div>
     </div></td>
@@ -250,6 +250,9 @@ function renderDetail(it) {
   }
   if (isSvc && it.executor) {
     specsHtml += specRow(T.specExecutor, esc(it.executor));
+  }
+  if (it.usdRate) {
+    specsHtml += specRow(T.specUsdRate, `${it.usdRate.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₴`);
   }
   specs.forEach(([k, v]) => {
     specsHtml += specRow(k, esc(v));

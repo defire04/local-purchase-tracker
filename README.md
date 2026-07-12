@@ -37,6 +37,7 @@ To attach local receipts (PDF, photos), place them in a `receipts/` subfolder in
     "order": "#624948",
     "date": "04.10.2019",
     "price": 1019,
+    "usdRate": 24.8771,
     "warrantyMonths": 24,
     "serialNumber": "ABC123",
     "executor": "",
@@ -58,6 +59,8 @@ To attach local receipts (PDF, photos), place them in a `receipts/` subfolder in
 `events[].type`: `warranty_claim` · `repair` · `returned` · `note`
 
 `executor` — used for service categories (contractor / company name); warranty and S/N are hidden for services.
+
+`usdRate` — official NBU USD/UAH rate on the purchase date, for historical price analysis (the live rate shown in the stats bar is today's rate, not adjusted for inflation/devaluation since purchase).
 
 ### `shops.json` — stores
 ```json
